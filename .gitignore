@@ -30,3 +30,14 @@
 *.exe
 *.out
 *.app
+
+# cmake, building folder, testfile
+build
+CMakeLists.txt
+test*
+loader.cpp
+
+.DS_Store
+
+data
+
