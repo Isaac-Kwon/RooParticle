@@ -42,3 +42,4 @@ cmake
 
 data*
 doc
+.pre-commit-clang-format
