@@ -36,8 +36,9 @@ build
 CMakeLists.txt
 test*
 loader.cpp
+cmake
 
 .DS_Store
 
-data
+data*
 
