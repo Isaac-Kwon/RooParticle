@@ -20,7 +20,6 @@ event::event(){
 
 //Copy Constructor
 event::event(event &e){
-
   list<particle*>::iterator p_;
   particle* p;
   particle* p2;
@@ -46,6 +45,22 @@ event::event(event &e){
 }
 
 event::~event(){
+
+  list<particle*>::iterator p_;
+  particle* p;
+  for(p_=particles.begin(); p_!=particles.end(); p_++){
+    p = *p_;
+    delete p;
+  }
+
+  //copy particles
+  // list<force*>::iterator ff_;
+  // force* ff;
+  // for(ff_=forces.begin(); ff_!=forces.end(); ff_++){
+  //   ff = *ff_;
+  //   delete ff;
+  // }
+
 }
 
 void event::DeriveDT(Double_t dt){
