@@ -6,6 +6,18 @@
 
 using namespace std;
 
+path::~path(){
+  delete[] t;
+
+  delete[] x;
+  delete[] y;
+  delete[] z;
+
+  delete[] vx;
+  delete[] vy;
+  delete[] vz;
+}
+
 Int_t path::AddRecord(TVectorD x_, TVectorD v_, Double_t time_){
   x[writingCursor] = x_[0];
   y[writingCursor] = x_[1];
