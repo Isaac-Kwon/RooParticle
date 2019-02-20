@@ -52,11 +52,6 @@ void particle::applyForce(const TVectorD f, const Double_t dt){
   }
   Double_t m_ = GetM(false);
   TVectorD a = f * (1/m_);
-  // std::cout<<"MASS  "<<GetM(false)<<endl;
-  // std::cout<<"VELO  "<<sqrt(v.Norm2Sqr())<<endl;
-  // std::cout<<"LOREN "<<1/sqrt(1-v.Norm2Sqr())<<endl;
-  // std::cout<<"FORCE "<<f[0]<<", "<<f[1]<<", "<<f[2]<<endl;
-  // std::cout<<"ACCEL "<<a[0]<<", "<<a[1]<<", "<<a[2]<<endl<<endl;
   applyDX(
     a * (0.5) * pow(dt,2) + v * dt
   );

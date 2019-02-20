@@ -18,9 +18,6 @@ TVectorD coulombForce::Evaluate(particle* p1_, particle* p2_){
   TVectorD unit = (p1->GetX() - p2->GetX())*(1/len);
   q1 = p1->GetQ();
   q2 = p2->GetQ();
-  //  = TVectorD(3);
   TVectorD tempforce = TVectorD(unit * coulombK * q1 * q2 * (1/pow(len,2)));
-  // tempforce.Print();
-  // std::cout<<"QQ"<<endl;
   return tempforce;
 }
