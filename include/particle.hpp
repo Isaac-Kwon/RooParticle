@@ -1,4 +1,3 @@
-
 #ifndef H_PARTICLE
 #define H_PARTICLE 1;
 
@@ -40,17 +39,17 @@ public:
   Double_t GetM0(){return m0;}
   Double_t GetM(Bool_t restmass=false);
 
-  Bool_t IsInvincible(){return Invincible;}
+  Bool_t   IsInvincible(){return Invincible;}
 
 protected:
   Double_t q          = 0;
 private:
-  TString name;
+  TString  name;
   TVectorD x          = TVectorD(3);
   TVectorD v          = TVectorD(3);
   Double_t m0         = 1;
-  Bool_t   Invincible = false;
 
+  Bool_t   Invincible = false;
   Bool_t   hold       = false;
   TVectorD hF         = TVectorD(3);
 };
@@ -62,8 +61,9 @@ public:
              Double_t q_  = 1,
              TVectorD x0_ = TVectorD(3),
              TVectorD v0_ = TVectorD(3),
-             Bool_t   Invincible_ = false):
-             particle(m0_, x0_, v0_, Invincible_){
+             Bool_t   Invincible_ = false,
+             Bool_t   Record_     = false):
+             particle(m0_, x0_, v0_, Invincible_, Record_){
                q = q_;
              }
   ~EMparticle(){}
