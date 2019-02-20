@@ -41,6 +41,6 @@ cmake
 
 .DS_Store
 
-data*
+#data*
 doc
 .pre-commit-clang-format
