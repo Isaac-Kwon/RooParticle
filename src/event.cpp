@@ -2,6 +2,8 @@
 #include "list"
 #include "stdio.h"
 
+#include "RPConfig.hpp"
+
 #include "TROOT.h"
 #include "TString.h"
 #include "TMatrixTBase.h"
@@ -87,5 +89,13 @@ void event::DeriveDT(Double_t dt){
   for(pp_=particles.begin(); pp_!=particles.end(); pp_++){
     pp = *pp_;
     pp->releaseForce(dt);
+  }
+}
+
+void event::DeriveMAX(Double_t dt){
+  Int_t i;
+  for(i=0; i<MAXSTEPS; i++){
+    DeriveDT(dt);
+    // std::cout<<"DERIVE: "<<i<<endl;
   }
 }

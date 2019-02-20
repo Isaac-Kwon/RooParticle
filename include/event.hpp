@@ -23,13 +23,14 @@ public:
   event(event &e);
   ~event();
 
-  void DeriveDT(Double_t dt=1);
   void AddParticle(particle* particle_){
     particles.push_back(particle_); nparticle++;
   }
   void AddForce(force * force_){forces.push_back(force_); nforce++;}
   void SetVolume(eventVolume * volume_){volume = volume_;}
 
+  void DeriveDT(Double_t dt = 1);
+  void DeriveMAX(Double_t dt = 1);
 
   Int_t getNParticle(){return nparticle;}
   Int_t getNForce(){return nforce;}
