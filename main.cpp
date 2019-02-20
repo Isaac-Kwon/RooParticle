@@ -1,82 +1,188 @@
-
-#include "TROOT.h"
-#include "TVectorT.h"
+#include "RPConfig.hpp"
 
 #include "event.hpp"
 #include "particle.hpp"
 #include "force.hpp"
-#include "eventVolume.hpp"
+
+#include "iostream"
+#include <math.h>
+
+#include "TROOT.h"
+#include "TTree.h"
+#include "TFile.h"
+
+
+using namespace std;
+
+// Test::Rutherford Scattering Tress Analysis
+
+class FixedTargetExperiment{
+public:
+  void setTemplate(event* eventT_){eventT=eventT_;}
+  void makeEvent(particle* p); // if event already on,
+  void offEvent(){eventOn=false;}
+  void delEvent(){eventOn=false; delete currentEvent;}
+  event* getEvent(){return currentEvent;}
+protected:
+private:
+  event * eventT;
+  Bool_t eventOn = false;
+  event * currentEvent;
+};
+
+void FixedTargetExperiment::makeEvent(particle* p){
+  eventOn = true;
+  currentEvent = new event(*eventT);
+  currentEvent->AddParticle(p);
+}
+
+
+Float_t RandomFloat(Float_t a, Float_t b) {
+    Float_t random = ((Float_t) rand()) / (Float_t) RAND_MAX;
+    Float_t diff = b - a;
+    Float_t r = random * diff;
+    return a + r;
+}
+
+TVectorD unitv(TVectorD v){
+  TVectorD result = TVectorD(3);
+  result = v*(1/sqrt(v.Norm2Sqr()));
+  return result;
+}
+
+Double_t angleXD(TVectorD v){
+  TVectorD unit = TVectorD(3);
+  unit = unitv(v);
+  Double_t result = acos(unit[0]);
+  return result*(180./3.1415926535);
+}
 
 int main(){
+  event * eventT = new event();
 
-  Int_t i;
-
-  std::cout<<"PARTICLE DEFINIATION"<<endl;
-
-  EMparticle* p1;
-  EMparticle* p2;
+  coulombForce * cp = new coulombForce();
+  eventVGeneral * vol = new eventVGeneral(40.,40.,40.);
 
   Double_t x1_[] = {0., 0., 0.};
   Double_t v1_[] = {0., 0., 0.};
-
   TVectorD x1 = TVectorD(3, x1_);
   TVectorD v1 = TVectorD(3, v1_);
+  EMparticle * p1 = new EMparticle(206,79, x1, v1, true, false);
+  // std::cout<<"INVINCIBLE "<<p1->IsInvincible()<<endl;
+  // std::cout<<"RECORDING "<<p1->IsRecording()<<endl;
+  eventT->AddParticle(p1);
 
-  Double_t x2_[] = {-10., 0., 0.};
-  Double_t v2_[] = {0.04, 0., 0.};
+  eventT->AddForce(cp);
+  eventT->SetVolume(vol);
 
-  TVectorD x2 = TVectorD(3, x2_);
-  TVectorD v2 = TVectorD(3, v2_);
+  FixedTargetExperiment * FTE = new FixedTargetExperiment();
+  FTE->setTemplate(eventT);
 
-  p1 = new EMparticle(206,79, x1, v1, true);
-  p2 = new EMparticle(1,1, x2, v2);
+  TVectorD x2 = TVectorD(3);
+  TVectorD v2 = TVectorD(3);
 
-  // std::cout<<"INITIAL EVENT GENERATION"<<endl;
+  Float_t imp_min = 0.;
+  Float_t imp_max = +1000.;
+  Float_t imp;
 
-  event* e = new event();
+  EMparticle * p2;
 
-  // std::cout<<"FORCE DEFINE"<<endl;
-  coulombForce* cp = new coulombForce();
+  Double_t v2_[] = {0.05,0.,0.};
+  v2 = TVectorD(3,v2_);
 
-  // std::cout<<"EVENT VOLUME GENERATION"<<endl;
+  Double_t x2_[] = {-200., 0., 0.,};
 
-  eventVGeneral * vol = new eventVGeneral(40.,40.,40.);
+  Int_t i;
+  Int_t j=0;
 
-  // std::cout<<"SET PARTICLE"<<endl;
+  for(j=0;j<1;j++){
+    TFile * hfile = new TFile(TString::Format("Data/test_%d.root",j),"RECREATE");
+    TTree * tree = new TTree(TString::Format("TT_%d",j), "Rutherford Scattering Angle");
+    Double_t   imp_tree;
+    Int_t      NPOINT_tree;
+    // Double_t (*  x_tree) = nullptr;
+    // Double_t (*  y_tree) = nullptr;
+    // Double_t (* vx_tree) = nullptr;
+    // Double_t (* vy_tree) = nullptr;
+    Double_t   vxF_tree;
+    Double_t   vyF_tree;
+    Double_t   SAngle_tree;
 
-  e->AddParticle(p1);
-  e->AddParticle(p2);
+    tree->Branch("imp", &imp_tree, "imp/D");
+    tree->Branch("NPOINT", &NPOINT_tree, "Npoint/I");
+    // tree->Branch("x", x_tree, "x[Npoint]/D");
+    // tree->Branch("y", y_tree, "y[Npoint]/D");
+    // tree->Branch("vx", vx_tree, "vx[Npoint]/D");
+    // tree->Branch("vy", vy_tree, "vy[Npoint]/D");
+    tree->Branch("vxF", & vxF_tree, "vxF/D");
+    tree->Branch("vyF", & vyF_tree, "vyF/D");
+    tree->Branch("SAngle", & SAngle_tree, "angle/D");
 
-  // std::cout<<"SET FORCE"<<endl;
 
-  e->AddForce(cp);
 
-  // std::cout<<"SET VOLUME"<<endl;
+    for(i=0; i<1 ;i++ ){
+      // cout<<"EVENT:"<<i<<endl;
+      imp = RandomFloat(imp_min,imp_max);
+      x2_[1] = imp;
+      x2 = TVectorD(3,x2_);
+      p2 = new EMparticle(4,2, x2, v2, false, true);
+      // cout<<"MAKE EVENT"<<endl;
+      FTE->makeEvent(p2);
+      // FTE->getEvent()->DeriveMAX();
+      // for(j=0; j<MAXSTEPS; j++){
+      //   FTE->getEvent()->DeriveDT();
+      // }
+      // cout<<"DERIVATION"<<endl;
+      FTE->getEvent()->DeriveMAX();
+      // cout<<"DERIVATION END"<<endl;
+      imp_tree = imp;
+      NPOINT_tree = p2->GetPath()->GetMaxNumber();
+      // x_tree =  (p2->GetPath()->GetAllX());
+      // y_tree =  (p2->GetPath()->GetAllY());
+      // vx_tree = (p2->GetPath()->GetAllVX());
+      // vy_tree =  (p2->GetPath()->GetAllVY());
+      vxF_tree = p2->GetPath()->GetLastV().operator[](0);
+      vyF_tree = p2->GetPath()->GetLastV().operator[](1);
+      SAngle_tree = angleXD(p2->GetPath()->GetLastV());
+      // cout<<"ACCESS DATA END"<<endl;
+      // cout<<"FILLING TREE"<<endl;
+      tree->Fill();
+      // cout<<"FILLING TREE END"<<endl;
+      // std::cout<<p2->IsInvincible()<<" :: "<<p2->GetX().operator[](0)<<"  "<<p2->GetX().operator[](1)<<" "<<p2->GetX().operator[](2)<<endl;
+      // std::cout<<"INIT"<<endl;
+      // p2->GetPath()->GetInitX().Print();
+      // p2->GetPath()->GetInitV().Print();
+      // std::cout<<"LAST"<<endl;
+      // p2->GetPath()->GetLastX().Print();
+      // p2->GetPath()->GetLastV().Print();
 
-  e->SetVolume(vol);
+      if(i%1000==0){
+        cout<<j<<"/"<<i<<":"<<imp_tree<<":"<<vxF_tree<<":"<<SAngle_tree<<endl;
+      }
 
-  // std::cout<<"EVENT GENERATION"<<endl;
-
-  TVectorD xx1 = TVectorD(3);
-  TVectorD xx2 = TVectorD(3);
-
-  // p1->GetX().Print();
-  // p2->GetX().Print();
-
-  for(i=0; i<10; i++){
-    std::cout<<"DERIVE NO "<<i<<endl;
-    // p1->GetX().Print();
-    // p2->GetX().Print();
-    xx1 = p1->GetX();
-    // xx1.Print();
-    xx2 = p2->GetX();
-    // xx2.Print();
-
-    std::cout<<"P1 :"<<xx1[0]<<", "<<xx1[1]<<", "<<xx1[2]<<endl;
-    std::cout<<"P2 :"<<xx2[0]<<", "<<xx2[1]<<", "<<xx2[2]<<endl;
-
-    e->DeriveDT(1);
+      cout<<p1->GetQ()<<endl;
+      cout<<p2->GetQ()<<endl;
+      cout<<p1->GetM()<<endl;
+      cout<<p2->GetM()<<endl;
+      // cout<<"OFF EVENT"<<endl;
+      FTE->offEvent();
+      // cout<<"DELETE EVENT"<<endl;
+      FTE->delEvent();
+      // cout<<"DELETE EVENT END"<<endl;
+    }
+    tree->Print();
+    tree->AutoSave();
+    hfile->Write();
+    hfile->Close();
+    delete hfile;
+    // tree->Delete();
+    // cout<<"TREE DELETED"<<endl;
   }
+
+
+
+
+
 
   return 0;
 
