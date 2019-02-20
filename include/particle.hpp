@@ -43,12 +43,12 @@ public:
   Bool_t IsInvincible(){return Invincible;}
 
 protected:
+  Double_t q          = 0;
 private:
   TString name;
   TVectorD x          = TVectorD(3);
   TVectorD v          = TVectorD(3);
   Double_t m0         = 1;
-  //Double_t q          = 1;
   Bool_t   Invincible = false;
 
   Bool_t   hold       = false;
@@ -69,8 +69,9 @@ public:
   ~EMparticle(){}
   Double_t GetQ(){return q;}
 
+
 private:
-  Double_t q;
+  // Double_t q;
 };
 
 #endif
