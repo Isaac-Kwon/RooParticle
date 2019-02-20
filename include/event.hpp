@@ -30,8 +30,9 @@ public:
   void AddForce(force * force_){forces.push_back(force_); nforce++;}
   void SetVolume(eventVolume * volume_){volume = volume_;}
 
-  Int_t getNParticle();
-  Int_t getNForce();
+
+  Int_t getNParticle(){return nparticle;}
+  Int_t getNForce(){return nforce;}
 
 protected:
 private:
