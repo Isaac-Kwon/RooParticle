@@ -20,6 +20,8 @@ using namespace std;
 class event{
 public:
   event();
+  event(event &e);
+  ~event();
 
   void DeriveDT(Double_t dt=1);
   void AddParticle(particle* particle_){

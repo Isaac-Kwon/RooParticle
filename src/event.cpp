@@ -12,7 +12,38 @@
 #include "particle.hpp"
 #include "event.hpp"
 
+//General Constructor (Not Include any procedure)
 event::event(){
+}
+
+//Copy Constructor
+event::event(event &e){
+
+  list<particle*>::iterator p_;
+  particle* p;
+  particle* p2;
+  for(p_=e.particles.begin(); p_!=e.particles.end(); p_++){
+    p = *p_;
+    p2 = new particle(*p);
+    AddParticle(p2);
+  }
+
+  //copy particles
+  list<force*>::iterator ff_;
+  force* ff;
+  for(ff_=e.forces.begin(); ff_!=e.forces.end(); ff_++){
+    ff = *ff_;
+    AddForce(ff);
+  }
+
+  //copy forces
+  volume = e.volume;
+
+  nparticle = e.nparticle;
+  nforce = e.nforce;
+}
+
+event::~event(){
 }
 
 void event::DeriveDT(Double_t dt){
