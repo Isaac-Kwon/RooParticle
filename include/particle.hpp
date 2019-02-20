@@ -21,7 +21,7 @@ public:
            Bool_t   Record_     = false);
   //Force Methods (Holding and Release)
   particle(const particle & p); //Copy Constructor
-  ~particle(){delete ppath;} //Destructor (NO Pointer Variable in class)
+  ~particle(){if(Record)delete ppath;} //Destructor (NO Pointer Variable in class)
 
   void holdForce(const TVectorD f);
   void releaseForce(const Double_t dt);
