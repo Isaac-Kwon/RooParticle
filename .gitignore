@@ -40,7 +40,7 @@ exclude
 cmake
 
 .DS_Store
-
+analysis
 test/Data/*
 test/main_private*
 doc
