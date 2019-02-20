@@ -16,6 +16,9 @@ public:
            TVectorD v0_ = TVectorD(3),
            Bool_t   Invincible_ = false);
   //Force Methods (Holding and Release)
+  particle(const particle & p); //Copy Constructor
+  ~particle(){delete ppath;} //Destructor (NO Pointer Variable in class)
+
   void holdForce(const TVectorD f);
   void releaseForce(const Double_t dt);
   void resetHold();

@@ -24,6 +24,19 @@ particle::particle(Double_t m0_,
  v  = v0_;
  hF = TVectorD(3);
  Invincible = Invincible_;
+//copy constructor
+particle::particle(const particle & p){
+  name       = p.name;
+  x          = p.x;
+  v          = p.v;
+  m0         = p.m0;
+  Invincible = p.Invincible;
+  Record     = p.Record;
+  hold       = p.hold;
+  hF         = p.hF;
+  etime      = p.etime;
+
+  q          = p.q;
 }
 
 void particle::holdForce(const TVectorD f){
