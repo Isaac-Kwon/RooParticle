@@ -41,6 +41,7 @@ cmake
 
 .DS_Store
 
-#data*
+test/Data/*
+test/main_private*
 doc
 .pre-commit-clang-format
