@@ -66,6 +66,7 @@ public:
              particle(m0_, x0_, v0_, Invincible_){
                q = q_;
              }
+  ~EMparticle(){}
   Double_t GetQ(){return q;}
 
 private:
