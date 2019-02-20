@@ -6,6 +6,10 @@
 #include "TMatrixTBase.h"
 #include "TVectorT.h"
 
+#include "path.hpp"
+
+using namespace std;
+
 class particle{
 public:
   // particle();
@@ -13,7 +17,8 @@ public:
            //Double_t q_  = 1,
            TVectorD x0_ = TVectorD(3),
            TVectorD v0_ = TVectorD(3),
-           Bool_t   Invincible_ = false);
+           Bool_t   Invincible_ = false,
+           Bool_t   Record_     = false);
   //Force Methods (Holding and Release)
   particle(const particle & p); //Copy Constructor
   ~particle(){delete ppath;} //Destructor (NO Pointer Variable in class)
@@ -32,14 +37,17 @@ public:
   void applyDelta(const TVectorD dx, const TVectorD dv){x += dx; v += dv;}
 
   void SetName(const TString name_){name=name_;}
+  void AddRecord(){if(Record)ppath->AddRecord(x,v,etime);}
 
   TVectorD GetX(){return TVectorD(x);}
   TVectorD GetV(){return TVectorD(v);}
   TVectorD GetP(){return TVectorD(v * GetM());}
   Double_t GetM0(){return m0;}
   Double_t GetM(Bool_t restmass=false);
+  path*    GetPath(){return ppath;}
 
   Bool_t   IsInvincible(){return Invincible;}
+  Bool_t   IsRecording(){return Record;}
 
 protected:
   Double_t q          = 0;
@@ -52,6 +60,11 @@ private:
   Bool_t   Invincible = false;
   Bool_t   hold       = false;
   TVectorD hF         = TVectorD(3);
+
+  Double_t etime      = 0.;
+
+  Bool_t   Record     = false;
+  path*    ppath;
 };
 
 class EMparticle : public particle{

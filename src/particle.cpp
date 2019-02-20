@@ -17,13 +17,22 @@ particle::particle(Double_t m0_,
                    // Double_t q_  = 1,
                    TVectorD x0_,
                    TVectorD v0_,
-                   Bool_t   Invincible_){
+                   Bool_t   Invincible_,
+                   Bool_t   Record_){
  m0 = m0_;
  // q  = q_;
  x  = x0_;
  v  = v0_;
  hF = TVectorD(3);
  Invincible = Invincible_;
+ if(Record_){
+   ppath = new path();
+   Record = true;
+ }else{
+   Record = false;
+ }
+}
+
 //copy constructor
 particle::particle(const particle & p){
   name       = p.name;
@@ -60,7 +69,10 @@ void particle::resetHold(){
 }
 
 void particle::applyForce(const TVectorD f, const Double_t dt){
-  if(Invincible){
+  if(Invincible==true){
+    if(Record==true){
+      ppath->AddRecord(x,v, etime);
+    }
     return;
   }
   Double_t m_ = GetM(false);
@@ -71,6 +83,9 @@ void particle::applyForce(const TVectorD f, const Double_t dt){
   applyDV(
     a * dt
   );
+  etime += dt;
+  if(Record==true){
+    ppath->AddRecord(x,v, etime);}
 }
 
 Double_t particle::GetM(Bool_t restmass){
