@@ -58,7 +58,7 @@ int main(){
   coulombForce * cp = new coulombForce();
   eventVGeneral * vol = new eventVGeneral(40.,40.,40.);
 
-  Double_t x1_[] = {300., 0., 0.};
+  Double_t x1_[] = {1000., 0., 0.};
   Double_t v1_[] = {-0.05,0.,0.};
   TVectorD x1 = TVectorD(3, x1_);
   TVectorD v1 = TVectorD(3, v1_);
@@ -82,19 +82,19 @@ int main(){
   Double_t v2_[] = {0.05,0.,0.};
   v2 = TVectorD(3,v2_);
 
-  Double_t x2_[] = {-300, 0., 0.,};
+  Double_t x2_[] = {-1000, 0., 0.,};
 
   Int_t i;
   Int_t j=0;
 
   for(j=0;j<1;j++){
-    TFile * hfile = new TFile(TString::Format("Data/test_collider_%d.root",j),"RECREATE");
-    TTree * tree = new TTree(TString::Format("TT_%d",j), "Two Particle Colliding Angle");
+    TFile * hfile = new TFile(TString::Format("Data/test_collider_long_%d.root",j),"RECREATE");
+    TTree * tree = new TTree(TString::Format("T_%d",j), "Two Particle Colliding Angle");
 
     Double_t   imp_tree;
     Int_t      NPOINT_tree;
-    // Double_t   vxF_tree;
-    // Double_t   vyF_tree;
+    Double_t   vx1_tree;
+    Double_t   vx2_tree;
     Double_t   SAngle1_tree;
     Double_t   SAngle2_tree;
     Double_t   DCA_tree;
@@ -102,15 +102,15 @@ int main(){
 
     tree->Branch("imp", &imp_tree, "imp/D");
     tree->Branch("NPOINT", &NPOINT_tree, "Npoint/I");
-    // tree->Branch("vxF", & vxF_tree, "vxF/D");
-    // tree->Branch("vyF", & vyF_tree, "vyF/D");
+    tree->Branch("vx1", & vx1_tree, "vx1/D");
+    tree->Branch("vx2", & vx2_tree, "vx2/D");
     tree->Branch("SAngle1", & SAngle1_tree, "angle1/D");
     tree->Branch("SAngle2", & SAngle2_tree, "angle2/D");
     tree->Branch("DCA", & DCA_tree, "DCA/D");
 
 
 
-    for(i=0; i<720000 ;i++ ){
+    for(i=0; i<10000 ;i++ ){
       imp = RandomFloat(imp_min,imp_max);
       x2_[1] = imp;
       x2 = TVectorD(3,x2_);
@@ -131,11 +131,14 @@ int main(){
       SAngle1_tree = angleXD(p2->GetPath()->GetLastV());
       SAngle2_tree = angleXD(CDE->getEvent()->getParticle(1)->GetPath()->GetLastV());
       p2->GetPath()->GetDCA(p1->GetPath(), DCA_tree, outtime_free);
+      vx1_tree = p1->GetPath()->GetLastX()[0];
+      vx2_tree = p2->GetPath()->GetLastX()[0];
 
       tree->Fill();
 
-      if(i%1000==0){
+      if(i%100==0){
         cout<<j<<"/"<<i<<":"<<imp_tree<<":"<<SAngle1_tree<<":"<<SAngle2_tree<<":"<<DCA_tree<<":"<<outtime_free<<endl;
+        cout<<"LAST POS P1: "<<p1->GetPath()->GetLastX()[0]<<endl;
         cout<<"LAST POS P2: "<<p2->GetPath()->GetLastX()[0]<<endl;
         // p2->GetPath()->GetLastV().Print();
         // CDE->getEvent()->getParticle(1)->GetPath()->GetLastV().Print();
