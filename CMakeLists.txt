@@ -55,6 +55,8 @@ link_libraries("-Wl,${ROOT_LIBRARIES}")
 add_compile_options("-Wall")
 add_compile_options("-Werror")
 add_compile_options("-Wpedantic")
+add_compile_options("-Wno-unused-variable")
+add_compile_options("-Wno-uninitialized")
 #add_compile_options("-v")
 
 # check for build in the source tree
