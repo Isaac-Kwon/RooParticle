@@ -1,1 +1,1 @@
-#define MAXSTEPS 10000
+#define MAXSTEPS 100000
