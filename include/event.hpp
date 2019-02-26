@@ -30,6 +30,7 @@ public:
   void SetVolume(eventVolume * volume_){volume = volume_;}
 
   void DeriveDT(Double_t dt = 1);
+  void DeriveDTN(Int_t n = 1; Double_t dt = 1);
   void DeriveMAX(Double_t dt = 1);
 
   particle * getParticle(Int_t index);

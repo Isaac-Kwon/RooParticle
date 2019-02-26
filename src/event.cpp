@@ -107,6 +107,14 @@ void event::DeriveDT(Double_t dt){
   }
 }
 
+void event::DeriveDTN(Int_t n, Double_t dt){
+  Int_t i;
+  for(i=0; i<n; i++){
+    DeriveDT(dt);
+    // std::cout<<"DERIVE: "<<i<<endl;
+  }
+}
+
 void event::DeriveMAX(Double_t dt){
   Int_t i;
   for(i=0; i<MAXSTEPS; i++){
