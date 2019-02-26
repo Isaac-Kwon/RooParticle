@@ -21,6 +21,10 @@ public:
   Double_t * GetAllVX(){return vx;}
   Double_t * GetAllVY(){return vy;}
   Double_t * GetAllVZ(){return vz;}
+  void     GetDCA(const TVectorD pos, Double_t & DCA, Double_t & outtime, Bool_t verbose=false);
+  void     GetDCA(path* timepath, Double_t & DCA, Double_t & outtime, Bool_t verbose=false);
+  // Double_t GetDCA(const TVectorD pos);
+  // Double_t GetDCA(path* timepath);
 protected:
 private:
   Int_t writingCursor = 0;
@@ -34,6 +38,9 @@ private:
   Double_t * vx = new Double_t[MAXSTEPS];
   Double_t * vy = new Double_t[MAXSTEPS];
   Double_t * vz = new Double_t[MAXSTEPS];
+
+  Bool_t lengthChk(path* target);
+  Bool_t timeChk(path* target);
 };
 
 #endif

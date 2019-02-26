@@ -4,6 +4,8 @@
 #include "path.hpp"
 #include "iostream"
 
+#include <math.h>
+
 using namespace std;
 
 path::~path(){
@@ -84,4 +86,75 @@ TVectorD path::GetLastV(){
     return TVectorD(0);
   }
   return GetRecordV(writingCursor-1);
+}
+
+// TVectorD path::GetCloestPosition()
+
+void path::GetDCA(const TVectorD pos, Double_t & DCA, Double_t & outtime, Bool_t verbose){
+  Int_t i;
+  Double_t resultDCA=std::numeric_limits<double>::max();
+  Double_t tempDCA=-2.;
+  Int_t resultTI=-1;
+  TVectorD tempvector = TVectorD(3);
+  for(i=0; i<writingCursor; i++){
+    tempvector = pos-GetRecordX(i);
+    tempDCA = sqrt(tempvector.Norm2Sqr());
+    if(tempDCA<resultDCA){
+      resultDCA = tempDCA;
+      resultTI = i;
+    }
+  }
+  if(resultTI==-1 || verbose){
+    std::cout<<"Algorithm Error:: Result Index 0"<<endl;
+  }
+  DCA     = resultDCA;
+  outtime = t[resultTI];
+}
+
+void path::GetDCA(path* timepath, Double_t & DCA, Double_t & outtime, Bool_t verbose){
+  if(!timeChk(timepath)){
+    return;
+  }
+
+  Int_t i;
+  Double_t resultDCA=std::numeric_limits<double>::max();
+  Double_t tempDCA=-2.;
+  Int_t resultTI=-1;
+  TVectorD tempvector = TVectorD(3);
+
+  for(i=0; i<writingCursor; i++){
+    tempvector = (timepath->GetRecordX(i))-GetRecordX(i);
+    tempDCA = sqrt(tempvector.Norm2Sqr());
+    if(tempDCA<resultDCA){
+      resultDCA = tempDCA;
+      resultTI = i;
+    }
+  }
+  DCA     = resultDCA;
+  outtime = t[resultTI];
+}
+
+Bool_t path::lengthChk(path* target){
+  if(GetMaxNumber()!=target->GetMaxNumber()){
+    std::cout<<"LENGTH CHK ERROR (NOT SAME)"<<endl;
+    return false;
+  }
+  else{
+    return true;
+  }
+}
+
+Bool_t path::timeChk(path* target){
+  if(!lengthChk(target)){
+    return false;
+  }
+
+  Int_t i;
+  for(i=0; i< target->GetMaxNumber();i++){
+    if(target->t[i]!=t[i]){
+      std::cout<<"TIME CHK ERROR: "<< i << endl;
+      return false;
+    }
+  }
+  return true;
 }

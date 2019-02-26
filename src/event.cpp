@@ -114,3 +114,25 @@ void event::DeriveMAX(Double_t dt){
     // std::cout<<"DERIVE: "<<i<<endl;
   }
 }
+
+particle * event::getParticle(Int_t index){
+
+  list<particle*>::iterator p1_;
+  particle* p1;
+
+  Int_t i=0;
+  if(index >= getNParticle()){
+    std::cout<<"CALL PARTICLE ERROR:: Index over NParticle"<<endl;
+    return 0;
+  }
+  for(p1_=particles.begin(); p1_!=particles.end(); p1_++){
+    // p1 = &p1_;
+    p1 = *p1_;
+    if(i==index){
+      return p1;
+    }
+    i++;
+  }
+  return p1;
+
+}

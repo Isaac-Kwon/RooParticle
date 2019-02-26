@@ -32,6 +32,8 @@ public:
   void DeriveDT(Double_t dt = 1);
   void DeriveMAX(Double_t dt = 1);
 
+  particle * getParticle(Int_t index);
+
   Int_t getNParticle(){return nparticle;}
   Int_t getNForce(){return nforce;}
 
