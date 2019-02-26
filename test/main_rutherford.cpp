@@ -114,14 +114,14 @@ int main(){
 
 
 
-    for(i=0; i<100 ;i++ ){
+    for(i=0; i<1000 ;i++ ){
       imp = RandomFloat(imp_min,imp_max);
       x2_[1] = imp;
       x2 = TVectorD(3,x2_);
       p2 = new EMparticle(4,2, x2, v2, false, true);
 
       FTE->makeEvent(p2);
-      FTE->getEvent()->DeriveMAX(1);
+      FTE->getEvent()->DeriveMAX();
 
       imp_tree = imp;
       NPOINT_tree = p2->GetPath()->GetMaxNumber();
