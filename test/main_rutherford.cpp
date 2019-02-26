@@ -132,7 +132,7 @@ int main(){
 
       tree->Fill();
 
-      if(i%1000==0){
+      if(i%50==0){
         cout<<j<<"/"<<i<<":"<<imp_tree<<":"<<vxF_tree<<":"<<SAngle_tree<<":"<<DCA_tree<<":"<<outtime_free<<endl;
       }
       FTE->offEvent();
