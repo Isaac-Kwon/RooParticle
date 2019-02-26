@@ -25,4 +25,13 @@ protected:
 private:
 };
 
+//G = Quantity[1.2331*10^-17, ("Femtometers" ("SpeedOfLight")^2)/("AtomicMassUnit")]
+class universalForce: public force{ //Gravity
+public:
+  universalForce():force(){}
+  TVectorD Evaluate(particle* p1_, particle* p2_);
+protected:
+private:
+};
+
 #endif
