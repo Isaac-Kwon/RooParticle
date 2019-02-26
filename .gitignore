@@ -33,11 +33,11 @@
 
 # cmake, building folder, testfile
 build
-CMakeLists.txt
+#CMakeLists.txt
 prove_test
 loader.cpp
 exclude
-cmake
+#cmake
 
 .DS_Store
 analysis
