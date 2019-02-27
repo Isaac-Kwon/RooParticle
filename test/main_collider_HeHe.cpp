@@ -109,10 +109,10 @@ int main(){
   tree->Branch("SAngle2", & SAngle2_tree, "angle2/D");
   tree->Branch("DCA", & DCA_tree, "DCA/D");
 
-  for(j=0;j<20;j++){
+  for(j=0;j<100;j++){
     TFile * hfile = new TFile(TString::Format("Data/test_collider_long_%d.root",j),"RECREATE");
 
-    for(i=0; i<1000 ;i++ ){
+    for(i=0; i<50 ;i++ ){
       imp = RandomFloat(imp_min,imp_max);
       x2_[1] = imp;
       x2 = TVectorD(3,x2_);
