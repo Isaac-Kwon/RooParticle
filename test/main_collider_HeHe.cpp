@@ -86,40 +86,39 @@ int main(){
 
   Int_t i;
   Int_t j=0;
+  TTree * tree = new TTree(TString::Format("T",j), "Two Particle Colliding Angle");
 
-  for(j=0;j<1;j++){
+  Double_t   imp_tree;
+  Int_t      NPOINT_tree;
+  Double_t   vx1_tree;
+  Double_t   vx2_tree;
+  Double_t * vx1p_tree;
+  Double_t * vx2p_tree;
+  Double_t   SAngle1_tree;
+  Double_t   SAngle2_tree;
+  Double_t   DCA_tree;
+  Double_t   outtime_free;
+
+  tree->Branch("imp", &imp_tree, "imp/D");
+  tree->Branch("NPOINT", &NPOINT_tree, "Npoint/I");
+  tree->Branch("x1", & vx1_tree, "x1/D");
+  tree->Branch("x2", & vx2_tree, "x2/D");
+  tree->Branch("x1p", vx1p_tree, "x1p[Npoint]/D");
+  tree->Branch("x2p", vx1p_tree, "x2p[Npoint]/D");
+  tree->Branch("SAngle1", & SAngle1_tree, "angle1/D");
+  tree->Branch("SAngle2", & SAngle2_tree, "angle2/D");
+  tree->Branch("DCA", & DCA_tree, "DCA/D");
+
+  for(j=0;j<20;j++){
     TFile * hfile = new TFile(TString::Format("Data/test_collider_long_%d.root",j),"RECREATE");
-    TTree * tree = new TTree(TString::Format("T_%d",j), "Two Particle Colliding Angle");
 
-    Double_t   imp_tree;
-    Int_t      NPOINT_tree;
-    Double_t   vx1_tree;
-    Double_t   vx2_tree;
-    Double_t   SAngle1_tree;
-    Double_t   SAngle2_tree;
-    Double_t   DCA_tree;
-    Double_t   outtime_free;
-
-    tree->Branch("imp", &imp_tree, "imp/D");
-    tree->Branch("NPOINT", &NPOINT_tree, "Npoint/I");
-    tree->Branch("vx1", & vx1_tree, "vx1/D");
-    tree->Branch("vx2", & vx2_tree, "vx2/D");
-    tree->Branch("SAngle1", & SAngle1_tree, "angle1/D");
-    tree->Branch("SAngle2", & SAngle2_tree, "angle2/D");
-    tree->Branch("DCA", & DCA_tree, "DCA/D");
-
-
-
-    for(i=0; i<10000 ;i++ ){
+    for(i=0; i<1000 ;i++ ){
       imp = RandomFloat(imp_min,imp_max);
       x2_[1] = imp;
       x2 = TVectorD(3,x2_);
 
       p1 = new EMparticle(4,2, x1, v1, false, true);
       p2 = new EMparticle(4,2, x2, v2, false, true);
-
-      // p1->GetX().Print();
-      // p2->GetX().Print();
 
       CDE->makeEvent(p2);
       CDE->getEvent()->AddParticle(p1);
