@@ -86,7 +86,7 @@ int main(){
 
   Int_t i;
   Int_t j=0;
-  TTree * tree = new TTree(TString::Format("T",j), "Two Particle Colliding Angle");
+  TTree * tree = new TTree("T", "Two Particle Colliding Angle");
 
   Double_t   imp_tree;
   Int_t      NPOINT_tree;
