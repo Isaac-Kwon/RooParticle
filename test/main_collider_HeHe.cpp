@@ -51,7 +51,7 @@ Double_t angleXD(TVectorD v){
   return result*(180./3.1415926535);
 }
 
-int main(){
+int main(int argc, char** argv){
 
   event * eventT = new event();
 
@@ -109,8 +109,8 @@ int main(){
   tree->Branch("SAngle2", & SAngle2_tree, "angle2/D");
   tree->Branch("DCA", & DCA_tree, "DCA/D");
 
-  for(j=0;j<100;j++){
-    TFile * hfile = new TFile(TString::Format("Data/test_collider_long_%d.root",j),"RECREATE");
+  for(j=0;j<1;j++){
+    TFile * hfile = new TFile(TString::Format("Data/test_collider_long_JOB_%s_%d.root",argv[0],j),"RECREATE");
 
     for(i=0; i<50 ;i++ ){
       imp = RandomFloat(imp_min,imp_max);
