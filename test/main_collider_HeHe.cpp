@@ -109,49 +109,54 @@ int main(int argc, char** argv){
   tree->Branch("SAngle2", & SAngle2_tree, "angle2/D");
   tree->Branch("DCA", & DCA_tree, "DCA/D");
 
-  for(j=0;j<1;j++){
-    TFile * hfile = new TFile(TString::Format("Data/test_collider_long_JOB_%s_%d.root",argv[0],j),"RECREATE");
 
-    for(i=0; i<50 ;i++ ){
-      imp = RandomFloat(imp_min,imp_max);
-      x2_[1] = imp;
-      x2 = TVectorD(3,x2_);
+  TFile * hfile = new TFile(TString::Format("Data/test_collider_long_JOB_%s_%d.root",argv[0],j),"RECREATE");
 
-      p1 = new EMparticle(4,2, x1, v1, false, true);
-      p2 = new EMparticle(4,2, x2, v2, false, true);
+  for(i=0; i<100 ;i++ ){
+    imp = RandomFloat(imp_min,imp_max);
+    x2_[1] = imp;
+    x2 = TVectorD(3,x2_);
 
-      CDE->makeEvent(p2);
-      CDE->getEvent()->AddParticle(p1);
+    p1 = new EMparticle(4,2, x1, v1, false, true);
+    p2 = new EMparticle(4,2, x2, v2, false, true);
 
-      CDE->getEvent()->DeriveMAX(1);
+    CDE->makeEvent(p2);
+    CDE->getEvent()->AddParticle(p1);
 
-      imp_tree = imp;
-      NPOINT_tree = p2->GetPath()->GetMaxNumber();
-      SAngle1_tree = angleXD(p2->GetPath()->GetLastV());
-      SAngle2_tree = angleXD(CDE->getEvent()->getParticle(1)->GetPath()->GetLastV());
-      p2->GetPath()->GetDCA(p1->GetPath(), DCA_tree, outtime_free);
-      vx1_tree = p1->GetPath()->GetLastX()[0];
-      vx2_tree = p2->GetPath()->GetLastX()[0];
+    CDE->getEvent()->DeriveMAX(1);
 
-      tree->Fill();
+    imp_tree = imp;
+    NPOINT_tree = p2->GetPath()->GetMaxNumber();
+    SAngle1_tree = angleXD(p2->GetPath()->GetLastV());
+    SAngle2_tree = angleXD(CDE->getEvent()->getParticle(1)->GetPath()->GetLastV());
+    p2->GetPath()->GetDCA(p1->GetPath(), DCA_tree, outtime_free);
+    vx1_tree = p1->GetPath()->GetLastX()[0];
+    vx2_tree = p2->GetPath()->GetLastX()[0];
 
-      if(i%100==0){
-        cout<<j<<"/"<<i<<":"<<imp_tree<<":"<<SAngle1_tree<<":"<<SAngle2_tree<<":"<<DCA_tree<<":"<<outtime_free<<endl;
-        cout<<"LAST POS P1: "<<p1->GetPath()->GetLastX()[0]<<endl;
-        cout<<"LAST POS P2: "<<p2->GetPath()->GetLastX()[0]<<endl;
-        // p2->GetPath()->GetLastV().Print();
-        // CDE->getEvent()->getParticle(1)->GetPath()->GetLastV().Print();
-      }
-      CDE->offEvent();
-      CDE->delEvent();
+    tree->Fill();
 
+    if(i%100==0&&argv==0){
+      cout<<argv[0]<<"/"<<i<<":"<<imp_tree<<":"<<SAngle1_tree<<":"<<SAngle2_tree<<":"<<DCA_tree<<":"<<outtime_free<<endl;
+      cout<<"LAST POS P1: "<<p1->GetPath()->GetLastX()[0]<<endl;
+      cout<<"LAST POS P2: "<<p2->GetPath()->GetLastX()[0]<<endl;
     }
-    tree->Print();
-    tree->AutoSave();
-    // hfile->Write();
-    hfile->Close();
-    delete hfile;
+      // p2->GetPath()->GetLastV().Print();
+      // CDE->getEvent()->getParticle(1)->GetPath()->GetLastV().Print();
+    }
+    CDE->offEvent();
+    CDE->delEvent();
+
   }
+  if(argc==0){
+    tree->Print();
+  }else{
+    cout<<"JOB END: "<<argv[0]<<endl;
+  }
+  tree->AutoSave();
+  // hfile->Write();
+  hfile->Close();
+  delete hfile;
+
 
   return 0;
 }
