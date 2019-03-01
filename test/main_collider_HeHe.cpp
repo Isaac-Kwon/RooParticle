@@ -110,7 +110,7 @@ int main(int argc, char** argv){
   tree->Branch("DCA", & DCA_tree, "DCA/D");
 
 
-  TFile * hfile = new TFile(TString::Format("Data/test_collider_long_JOB_%s_%d.root",argv[0],j),"RECREATE");
+  TFile * hfile = new TFile(TString::Format("Data/test_collider_long_JOB_%s_%d.root",argv[1],j),"RECREATE");
 
   for(i=0; i<100 ;i++ ){
     imp = RandomFloat(imp_min,imp_max);
@@ -145,7 +145,7 @@ int main(int argc, char** argv){
   }
   CDE->offEvent();
   CDE->delEvent();
-  
+
   if(argc==0){
     tree->Print();
   }else{
