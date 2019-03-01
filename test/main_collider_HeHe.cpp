@@ -142,11 +142,10 @@ int main(int argc, char** argv){
     }
       // p2->GetPath()->GetLastV().Print();
       // CDE->getEvent()->getParticle(1)->GetPath()->GetLastV().Print();
-    }
-    CDE->offEvent();
-    CDE->delEvent();
-
   }
+  CDE->offEvent();
+  CDE->delEvent();
+  
   if(argc==0){
     tree->Print();
   }else{
