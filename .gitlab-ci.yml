@@ -1,0 +1,7 @@
+image: gitlab-registry.cern.ch/mkwon/rooparticle:latest
+
+buildtest:
+    script:
+        - source /~/~/root6/root/bin/thisroot.sh
+        - mkdir build
+        - (cd build && cmake3 ../ && make -j9)
