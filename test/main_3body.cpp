@@ -7,6 +7,7 @@
 
 #include "iostream"
 #include <math.h>
+#include <ctime>
 
 #include "TROOT.h"
 #include "TTree.h"
@@ -187,7 +188,7 @@ int main(int argc, char** argv){
   tree->Branch("zvy2", &lvy2_tree, "lvy2/D");
   tree->Branch("zvz2", &lvz2_tree, "lvz2/D");
 
-  TRandom3 * rg = new TRandom3();
+  TRandom3 * rg = new TRandom3((unsigned int) time(NULL));
 
   Int_t i;
   for(i=0; i<1000 ;i++ ){
