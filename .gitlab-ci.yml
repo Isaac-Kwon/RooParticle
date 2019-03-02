@@ -1,6 +1,5 @@
-before_script:
- - yum update -y
- - yum install -y cmake3
+image:
+    name:"rootproject/root-ubuntu16"
 
 defaultci:
     only:
