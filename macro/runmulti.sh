@@ -12,7 +12,7 @@ for (( i = 0; i < $3; )); do
   if [ ${i} -eq $3 ];then
     break
   fi
-  i=$((i+=1))
   $1 $2 $i
+  i=$((i+=1))
   # echo outside
 done
