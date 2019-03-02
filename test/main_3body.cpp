@@ -208,7 +208,7 @@ int main(int argc, char** argv){
   TRandom3 * rg = new TRandom3((unsigned int) time(NULL));
 
   Int_t i;
-  for(i=0; i<1000 ;i++ ){
+  for(i=0; i<10000 ;i++ ){
     x2_[0] = rg->Uniform(xmin, xmax);
     x2_[1] = rg->Uniform(ymin, ymax);
     x2 = TVectorD(3,x2_);
