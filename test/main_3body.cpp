@@ -230,6 +230,7 @@ int main(int argc, char** argv){
   MBE->delEvent();
 
   tree->Print();
+  cout<<"END PRODUCTION "<<(argc>2?argv[2]:"")<<endl;
   tree->AutoSave();
   hfile->Write();
   hfile->Close();
