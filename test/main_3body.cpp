@@ -244,7 +244,7 @@ int main(int argc, char** argv){
 
     tree->Fill();
 
-    if(i%1==0){
+    if(i%100==0){
       cout<<(argc>2?argv[2]:"0")<<"/"<<i<<" : DCA "<<DCAAB_tree<<"|"<<DCATA_tree<<","<<DCATB_tree<<" : TCA "<<TCAAB_tree<<"|"<<TCATA_tree<<","<<TCATB_tree<<endl;
     }
   }
