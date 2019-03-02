@@ -1,8 +1,4 @@
-image: rootproject/root-ubuntu16:latest
-
-before_script:
- - apt-get update --yes
- - apt-get install --yes cmake3
+image: gitlab-registry.cern.ch/mkwon/rooparticle:latest
 
 
 defaultci:
