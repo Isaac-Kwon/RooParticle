@@ -1,8 +1,6 @@
 image: gitlab-registry.cern.ch/mkwon/rooparticle:latest
 
-defaultci:
-    only:
-        - develop
+buildtest:
     script:
         - source /~/~/root6/root/bin/thisroot.sh
         - mkdir build
