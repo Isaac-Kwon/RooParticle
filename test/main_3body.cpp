@@ -127,6 +127,7 @@ int main(int argc, char** argv){
     rfilename = TString::Format("Data/%s_%s.root", argv[1], argv[2]);
   }
 
+  cout<<"SAVE DATA IN: "<<rfilename<<endl;
   TFile * hfile = new TFile(rfilename,"RECREATE");
   TTree * tree = new TTree("T", "Multibody particle interaction");
 
@@ -187,6 +188,7 @@ int main(int argc, char** argv){
   tree->Branch("zvz2", &lvz2_tree, "lvz2/D");
 
   TRandom3 * rg = new TRandom3();
+
   Int_t i;
   for(i=0; i<10000 ;i++ ){
     x2_[0] = rg->Uniform(xmin, xmax);
@@ -210,19 +212,18 @@ int main(int argc, char** argv){
     sy2_tree  = x2_[1];
     sz2_tree  = x2_[2];
 
-    lvx1_tree = p1->GetPath()->GetLastV().operator[](0);
-    lvy1_tree = p1->GetPath()->GetLastV().operator[](1);
-    lvz1_tree = p1->GetPath()->GetLastV().operator[](2);
+    lvx1_tree = p2->GetPath()->GetLastV().operator[](0);
+    lvy1_tree = p2->GetPath()->GetLastV().operator[](1);
+    lvz1_tree = p2->GetPath()->GetLastV().operator[](2);
 
-    lvx2_tree = p2->GetPath()->GetLastV().operator[](0);
-    lvy2_tree = p2->GetPath()->GetLastV().operator[](1);
-    lvz2_tree = p2->GetPath()->GetLastV().operator[](2);
+    lvx2_tree = p3->GetPath()->GetLastV().operator[](0);
+    lvy2_tree = p3->GetPath()->GetLastV().operator[](1);
+    lvz2_tree = p3->GetPath()->GetLastV().operator[](2);
 
     tree->Fill();
 
-
     if(i%1000==0){
-      cout<<argv[2]<<"/"<<i<<":"<<sx1_tree<<":"<<sy1_tree<<":"<<sx2_tree<<":"<<sy2_tree<<":"<<sqrt(pow(lvx1_tree,2)+pow(lvy1_tree,2))<<":"<<endl;
+      cout<<(argc>2?argv[2]:"0")<<"/"<<i<<":"<<sx1_tree<<":"<<sy1_tree<<":"<<sx2_tree<<":"<<sy2_tree<<":"<<sqrt(pow(lvx1_tree,2)+pow(lvy1_tree,2))<<":"<<endl;
     }
   }
   MBE->offEvent();
