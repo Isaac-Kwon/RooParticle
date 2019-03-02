@@ -1,6 +1,6 @@
 before_script:
- - yum update --yes
- - yum install --yes cmake3
+ - yum update -y
+ - yum install -y cmake3
 
 defaultci:
     only:
