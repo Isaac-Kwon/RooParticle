@@ -1,0 +1,6 @@
+defaultci:
+    only:
+        develop
+    script:
+          - mkdir build
+          - (cd build && cmake3 ../ && make -j $(nproc) all format-check)
