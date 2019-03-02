@@ -6,4 +6,4 @@ defaultci:
     script:
         - source /~/~/root6/root/bin/thisroot.sh
         - mkdir build
-        - (cd build && cmake3 ../ && make -j $(nproc) all format-check)
+        - (cd build && cmake3 ../ && make -j9
