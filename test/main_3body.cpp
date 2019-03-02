@@ -112,7 +112,7 @@ int main(int argc, char** argv){
   Double_t x2_[] = { 0., 0., startZl};
   Double_t x3_[] = { 0., 0., startZr};
 
-  Double_t v2_[] = { 0., 0. , 0.05 };
+  Double_t v2_[] = { 0., 0. , -0.05 };
   Double_t v3_[] = { 0., 0. , 0.05 };
   v2 = TVectorD(3,v2_);
   v3 = TVectorD(3,v3_);
@@ -220,7 +220,7 @@ int main(int argc, char** argv){
     p3 = new EMparticle(4,2, x3, v3, false, true);
 
     MBE->makeEvent(p2, p3);
-    MBE->getEvent()->DeriveDTN(10000);
+    MBE->getEvent()->DeriveMAX();
 
     sx1_tree  = x2_[0];
     sy1_tree  = x2_[1];
@@ -244,8 +244,8 @@ int main(int argc, char** argv){
 
     tree->Fill();
 
-    if(i%1000==0){
-      cout<<(argc>2?argv[2]:"0")<<"/"<<i<<":"<<sx1_tree<<":"<<sy1_tree<<":"<<sx2_tree<<":"<<sy2_tree<<":"<<sqrt(pow(lvx1_tree,2)+pow(lvy1_tree,2))<<":"<<endl;
+    if(i%1==0){
+      cout<<(argc>2?argv[2]:"0")<<"/"<<i<<" : DCA "<<DCAAB_tree<<"|"<<DCATA_tree<<","<<DCATB_tree<<" : TCA "<<TCAAB_tree<<"|"<<TCATA_tree<<","<<TCATB_tree<<endl;
     }
   }
   MBE->offEvent();
