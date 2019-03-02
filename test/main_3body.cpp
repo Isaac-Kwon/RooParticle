@@ -154,6 +154,16 @@ int main(int argc, char** argv){
   Double_t   lvy2_tree;
   Double_t   lvz2_tree;
 
+  //Distance Closest Approach
+  Double_t   DCATA_tree;
+  Double_t   DCATB_tree;
+  Double_t   DCAAB_tree;
+
+  //Time Closest Approach
+  Double_t   TCATA_tree;
+  Double_t   TCATB_tree;
+  Double_t   TCAAB_tree;
+
   // Double_t * x1p_tree;
   // Double_t * y1p_tree;
   // Double_t * z1p_tree;
@@ -183,6 +193,17 @@ int main(int argc, char** argv){
   tree->Branch("lvx2", &lvx2_tree, "lvx2/D");
   tree->Branch("lvy2", &lvy2_tree, "lvy2/D");
   tree->Branch("lvz2", &lvz2_tree, "lvz2/D");
+
+  //Branch: DCA (TA, TB, AB)
+  tree->Branch("DCA_TA", &DCATA_tree, "DCA_TA/D");
+  tree->Branch("DCA_TB", &DCATB_tree, "DCA_TB/D");
+  tree->Branch("DCA_AB", &DCAAB_tree, "DCA_AB/D");
+
+  //Branch: TCA (TA, TB, AB)
+  tree->Branch("TCA_TA", &TCATA_tree, "TCA_TA/D");
+  tree->Branch("TCA_TB", &TCATB_tree, "TCA_TB/D");
+  tree->Branch("TCA_AB", &TCAAB_tree, "TCA_AB/D");
+
 
   TRandom3 * rg = new TRandom3((unsigned int) time(NULL));
 
@@ -216,6 +237,10 @@ int main(int argc, char** argv){
     lvx2_tree = p3->GetPath()->GetLastV().operator[](0);
     lvy2_tree = p3->GetPath()->GetLastV().operator[](1);
     lvz2_tree = p3->GetPath()->GetLastV().operator[](2);
+
+    p2->GetPath()->GetDCA(p3->GetPath(), DCAAB_tree, TCAAB_tree);
+    p2->GetPath()->GetDCA(x1, DCATA_tree, TCATA_tree);
+    p3->GetPath()->GetDCA(x1, DCATB_tree, TCATB_tree);
 
     tree->Fill();
 
