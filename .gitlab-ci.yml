@@ -4,5 +4,6 @@ defaultci:
     only:
         - develop
     script:
+        - source /~/~/root6/root/bin/thisroot.sh
         - mkdir build
         - (cd build && cmake3 ../ && make -j $(nproc) all format-check)
