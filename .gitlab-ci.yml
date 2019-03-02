@@ -1,5 +1,4 @@
-image:
-    name:"rootproject/root-ubuntu16:latest"
+image: rootproject/root-ubuntu16:latest
 
 defaultci:
     only:
