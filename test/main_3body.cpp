@@ -184,10 +184,6 @@ int main(int argc, char** argv){
   tree->Branch("lvy2", &lvy2_tree, "lvy2/D");
   tree->Branch("lvz2", &lvz2_tree, "lvz2/D");
 
-  tree->Branch("zvx2", &lvx2_tree, "lvx2/D");
-  tree->Branch("zvy2", &lvy2_tree, "lvy2/D");
-  tree->Branch("zvz2", &lvz2_tree, "lvz2/D");
-
   TRandom3 * rg = new TRandom3((unsigned int) time(NULL));
 
   Int_t i;
@@ -205,13 +201,13 @@ int main(int argc, char** argv){
     MBE->makeEvent(p2, p3);
     MBE->getEvent()->DeriveDTN(10000);
 
-    sx1_tree  = x1_[0];
-    sy1_tree  = x1_[1];
-    sz1_tree  = x1_[2];
+    sx1_tree  = x2_[0];
+    sy1_tree  = x2_[1];
+    sz1_tree  = x2_[2];
 
-    sx2_tree  = x2_[0];
-    sy2_tree  = x2_[1];
-    sz2_tree  = x2_[2];
+    sx2_tree  = x3_[0];
+    sy2_tree  = x3_[1];
+    sz2_tree  = x3_[2];
 
     lvx1_tree = p2->GetPath()->GetLastV().operator[](0);
     lvy1_tree = p2->GetPath()->GetLastV().operator[](1);
@@ -233,7 +229,6 @@ int main(int argc, char** argv){
   tree->Print();
   cout<<"END PRODUCTION "<<(argc>2?argv[2]:"")<<endl;
   tree->AutoSave();
-  hfile->Write();
   hfile->Close();
   delete hfile;
   // tree->Delete();
