@@ -8,19 +8,19 @@ from time import sleep
 # python3 runmulti title njob ncore
 
 class JobManager:
-    def __init__(target, ncore=4, verbose=False):
+    def __init__(self, target, ncore=4, verbose=False):
         self.target  = target
         self.ncore   = ncore
         self.joblist = list()
         self.verbose = verbose
     def Run(self, args, njob=10):
         try:
-            for jobN in range(len(njob)):
-                if len(self.joblist())<ncore:
+            for jobN in range(njob):
+                if len(self.joblist)<self.ncore:
                     if self.verbose:
-                        print("NOW RUN : JOB NUMBER %d" %i)
-                    self.joblist.append(subprocess.Popen([target]+args+[str(jobN)]))
-                    sleep(2.0);
+                        print("NOW RUN : JOB NUMBER %d" %jobN)
+                    self.joblist.append(subprocess.Popen([self.target]+args+[str(jobN)]))
+                    sleep(1.0);
                 if self.DeleteKilled():
                     pass
                 else:
@@ -43,4 +43,5 @@ class JobManager:
         return False
 
 if __name__ == "__main__":
-    jm = JobManager(argv[1], 4, True)
+    jm = JobManager(argv[1], 10, True)
+    jm.Run([argv[2]], argv[3])
