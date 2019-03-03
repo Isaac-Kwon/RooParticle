@@ -15,14 +15,19 @@ class JobManager:
         self.verbose = verbose
     def Run(self, args, njob=10):
         try:
-            for jobN in range(int(njob)):
+            jobN = 0
+            while True:
+                if jobN==njob:
+                    for i in range(len(self.joblist)):
+                        self.joblist[i].wait()
                 if len(self.joblist)<self.ncore:
                     if self.verbose:
                         print("NOW RUN : JOB NUMBER %d" %jobN)
                     self.joblist.append(subprocess.Popen([self.target]+args+[str(jobN)]))
+                    jobN = jobN+1;
                     sleep(1.0);
-                    for i in range(len(self.joblist)):
-                        self.DeleteKilled()
+                for i in range(len(self.joblist)):
+                    self.DeleteKilled()
         except KeyboardInterrupt:
             print("KILL ALL PROCESS")
             for i in range(len(self.joblist)):
