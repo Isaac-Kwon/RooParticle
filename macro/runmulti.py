@@ -15,7 +15,7 @@ class JobManager:
         self.verbose = verbose
     def Run(self, args, njob=10):
         try:
-            for jobN in range(njob):
+            for jobN in range(int(njob)):
                 if len(self.joblist)<self.ncore:
                     if self.verbose:
                         print("NOW RUN : JOB NUMBER %d" %jobN)
