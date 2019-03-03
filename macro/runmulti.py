@@ -27,7 +27,7 @@ class JobManager:
                     sleep(1.0);
         except KeyboardInterrupt:
             print("KILL ALL PROCESS")
-            for i in range(len(joblist)):
+            for i in range(len(self.joblist)):
                 self.joblist[i].kill()
                 self.joblist[i].wait()
                 if self.verbose:
