@@ -21,9 +21,7 @@ class JobManager:
                         print("NOW RUN : JOB NUMBER %d" %jobN)
                     self.joblist.append(subprocess.Popen([self.target]+args+[str(jobN)]))
                     sleep(1.0);
-                if self.DeleteKilled():
-                    pass
-                else:
+                while not self.DeleteKilled():
                     sleep(1.0);
         except KeyboardInterrupt:
             print("KILL ALL PROCESS")
