@@ -43,5 +43,5 @@ class JobManager:
         return False
 
 if __name__ == "__main__":
-    jm = JobManager(argv[1], 10, True)
-    jm.Run([argv[2]], argv[3])
+    jm = JobManager(sys.argv[1], 10, True)
+    jm.Run([sys.argv[2]], sys.argv[3])
