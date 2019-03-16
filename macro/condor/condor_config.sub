@@ -1,0 +1,6 @@
+executable              = something
+arguments               = mtest_condor $(ClusterId) $(ProcId)
+output                  = condor/output/run.$(ClusterId).$(ProcId).out
+error                   = condor/error/run.$(ClusterId).$(ProcId).err
+log                     = condor/log/run.$(ClusterId).log
+queue 10

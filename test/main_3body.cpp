@@ -124,8 +124,10 @@ int main(int argc, char** argv){
     rfilename = TString("Data/test_0.root");
   }else if(argc==2){
     rfilename = TString::Format("Data/%s_0.root", argv[1]);
-  }else{
+  }else if(argc==3){
     rfilename = TString::Format("Data/%s_%s.root", argv[1], argv[2]);
+  }else{
+    rfilename = TString::Format("Data/%s_%s_%s.root", argv[1], argv[2], argv[3]);
   }
 
   cout<<"SAVE DATA IN: "<<rfilename<<endl;
