@@ -213,8 +213,8 @@ int main(int argc, char** argv){
   tree->Branch("TCA_TB", &TCATB_tree, "TCA_TB/D");
   tree->Branch("TCA_AB", &TCAAB_tree, "TCA_AB/D");
 
-  tree->Branch("RSeed",  &randseed),  "RSeed/I";
-  tree->Branch("RSeed",  &RN_tree),  "RN/I";
+  tree->Branch("RSeed",  &randseed,  "RSeed/I");
+  tree->Branch("RSeed",  &RN_tree,  "RN/I");
 
   TRandom3 * rg = new TRandom3(randseed);
 
