@@ -8,5 +8,5 @@ request_cpus            = 1
 request_memory          = 1G
 notification            = Error
 getenv                  = true
-#transfer_output_files   = build/mtest_condor_$(ClusterID)_$(ProcID).root
+#transfer_output_files   = build/Data/mtest_condor_$(ClusterID)_$(ProcID).root
 queue 1
