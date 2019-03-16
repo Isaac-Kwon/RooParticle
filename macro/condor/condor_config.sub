@@ -3,4 +3,10 @@ arguments               = excutable_Path_in_Build mtest_condor $(ClusterId) $(Pr
 output                  = condor/output/run.$(ClusterId).$(ProcId).out
 error                   = condor/error/run.$(ClusterId).$(ProcId).err
 log                     = condor/log/run.$(ClusterId).log
+#notify_user             = UserID@Domain.com
+request_cpus            = 1
+request_memory          = 1G
+notification            = Error
+getenv                  = true
+#transfer_output_files   = build/mtest_condor_$(ClusterID)_$(ProcID).root
 queue 1
