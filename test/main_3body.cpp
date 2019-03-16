@@ -175,6 +175,13 @@ int main(int argc, char** argv){
   // Double_t * z2p_tree;
 
   Double_t   outtime_free;
+  Int_t      RN_tree;
+
+  unsigned int randseed = (unsigned int) time(NULL);
+
+  if(argc>=4){
+    randseed = randseed * int(argv[3]) + int(argv[2]);
+  }
 
   //Branch: starting point 1
   tree->Branch("sx1", &sx1_tree , "sx1/D");
@@ -206,11 +213,14 @@ int main(int argc, char** argv){
   tree->Branch("TCA_TB", &TCATB_tree, "TCA_TB/D");
   tree->Branch("TCA_AB", &TCAAB_tree, "TCA_AB/D");
 
+  tree->Branch("RSeed",  &randseed),  "RSeed/I";
+  tree->Branch("RSeed",  &RN_tree),  "RN/I";
 
-  TRandom3 * rg = new TRandom3((unsigned int) time(NULL));
+  TRandom3 * rg = new TRandom3(randseed);
 
   Int_t i;
   for(i=0; i<1000 ;i++ ){
+    RN_tree = i;
     x2_[0] = rg->Uniform(xmin, xmax);
     x2_[1] = rg->Uniform(ymin, ymax);
     x2 = TVectorD(3,x2_);
