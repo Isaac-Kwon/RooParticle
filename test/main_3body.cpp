@@ -180,7 +180,7 @@ int main(int argc, char** argv){
   unsigned int randseed = (unsigned int) time(NULL);
 
   if(argc>=4){
-    randseed = randseed * int(argv[3]) + int(argv[2]);
+    randseed = randseed * atof(argv[3]) + atof(argv[2]);
   }
 
   //Branch: starting point 1
