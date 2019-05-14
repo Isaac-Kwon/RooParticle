@@ -39,7 +39,6 @@ event::event(event &e){
 
   //copy forces
   volume = e.volume;
-
   nparticle = e.nparticle;
   nforce = e.nforce;
 }
@@ -70,11 +69,9 @@ void event::DeriveDT(Double_t dt){
   list<force*>::iterator    ff_;
 
   list<particle*>::iterator pp_;
-  particle* pp;
 
-  particle* p1;
-  particle* p2;
-  force* ff;
+  particle *pp, *p1, *p2;
+  force *ff;
 
   TVectorD tempforce = TVectorD(3);
 
