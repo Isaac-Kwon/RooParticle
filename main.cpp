@@ -58,8 +58,22 @@ Double_t angleXD(TVectorD v){
 }
 
 int main(){
-  event * eventT = new event();
 
+  /* START OF EVENT Template Definition */
+  /* Event Template */
+  // TEMPLATE PARTICLE
+  // 1. Fixed Target GOLD
+  //   - Atomic Number: 79
+  //   - Mass Number 197
+  //   - At position (0,0,0)
+  //   - with initial Velocity (0,0,0)
+  //   - Rigid Body (not affected by any force. no momemtum variation)
+  // TEMPLATE FORCE
+  // 1. Coulomb Force (in force.cpp/hpp)
+  // TEMPLATE VOLUME
+  // (There is volume def. but don't do anything)
+
+  event * eventT = new event();
   coulombForce * cp = new coulombForce();
   eventVGeneral * vol = new eventVGeneral(40.,40.,40.);
 
@@ -67,35 +81,50 @@ int main(){
   Double_t v1_[] = {0., 0., 0.};
   TVectorD x1 = TVectorD(3, x1_);
   TVectorD v1 = TVectorD(3, v1_);
-  EMparticle * p1 = new EMparticle(206,79, x1, v1, true, false);
-  eventT->AddParticle(p1);
+  EMparticle * p1 = new EMparticle(197,79, x1, v1, true, false);
 
+  eventT->AddParticle(p1);
   eventT->AddForce(cp);
   eventT->SetVolume(vol);
 
+  /* END OF EVENT Template Definition */
+  /* Fixed Target Experiment Production */
+
   FixedTargetExperiment * FTE = new FixedTargetExperiment();
-  FTE->setTemplate(eventT);
 
-  TVectorD x2 = TVectorD(3);
-  TVectorD v2 = TVectorD(3);
+  FTE->setTemplate(eventT); // Set Event Tempate with defined template
 
-  Float_t imp_min = 0.;
-  Float_t imp_max = +1000.;
-  Float_t imp;
+  /* START OF PROJECTILE PARTICLE DEFINITION */
+  TVectorD x2 = TVectorD(3); // DEF) Projectile Particle Initial Position (Vector)
+  TVectorD v2 = TVectorD(3); // DEF) Projectile Particle Initial Velocity (Vector)
 
-  EMparticle * p2;
+  Float_t imp_min = 0.;      // DEF,SET) Projectile Particle Minimum Impact Parameter
+  Float_t imp_max = +1000.;  // DEF,SET) Projectile Particle Maximum Impact Parameter
+  Float_t imp;               // DEF)     Projectile Particle Impact Parameter
 
-  Double_t v2_[] = {0.05,0.,0.};
-  v2 = TVectorD(3,v2_);
+  EMparticle * p2;           // DEF)     Projectile Particle
 
-  Double_t x2_[] = {-200., 0., 0.,};
+  Double_t v2_[] = {0.05,0.,0.}; // DEF,SET) Projectile Particle Initial Velocity (NumArray)
+  v2 = TVectorD(3,v2_);          // SET) Projectile Particle Initial Velocity (Vector)
 
-  Int_t i;
-  Int_t j=0;
+  Double_t x2_[] = {-200., 0., 0.,}; // DEF,SET) Projectile Particle Initial Position (NumArray)
+
+  Int_t i; // Produced Particle Number
+  Int_t j=0; // Produced ROOT File Number
 
   for(j=0;j<1;j++){
-    TFile * hfile = new TFile(TString::Format("Data/test_%d.root",j),"RECREATE");
+
+    TFile * hfile = new TFile(TString::Format("Data/FixedTarget_%d.root",j),"RECREATE");
     TTree * tree = new TTree(TString::Format("TT_%d",j), "Rutherford Scattering Angle");
+
+    // TREE Entry Properties
+    // for Each event, followings will be recorded.
+    // imp_tree: Impact Parameter
+    // NPOINT_tree: Number of points iterated.
+    // vxF_tree: Final VelocityX
+    // vyF_tree: Final VelocityY
+    // vyF_tree: Scattering Angle (calculated from vxF, vyF)
+
     Double_t   imp_tree;
     Int_t      NPOINT_tree;
     Double_t   vxF_tree;
@@ -114,14 +143,18 @@ int main(){
 
 
 
-    for(i=0; i<1 ;i++ ){
     for(i=0; i<1000000 ;i++ ){
+      //Start Single Event Production
+      //1. for Randomized Impact Parameter
       imp = RandomFloat(imp_min,imp_max);
       x2_[1] = imp;
       x2 = TVectorD(3,x2_);
+      //Produce Particle with impact parameter
       p2 = new EMparticle(4,2, x2, v2, false, true);
+      //make Event with projectile p2
       FTE->makeEvent(p2);
       FTE->getEvent()->DeriveMAX();
+      //take value from event
       imp_tree = imp;
       NPOINT_tree = p2->GetPath()->GetMaxNumber();
       vxF_tree = p2->GetPath()->GetLastV().operator[](0);
@@ -145,11 +178,6 @@ int main(){
     hfile->Write();
     hfile->Close();
   }
-
-
-
-
-
 
   return 0;
 
