@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.2)
 project(trillision)
 
+#find_package(Sanitizers)
+
 # by default build optimized code with debug symbols
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
@@ -53,10 +55,18 @@ link_libraries("-Wl,${ROOT_LIBRARIES}")
 # link_libraries("${ROOT_EXE_LINKER_FLAGS},${ROOT_LIBRARIES}")
 # link_libraries("-Wl")
 add_compile_options("-Wall")
-add_compile_options("-Werror")
+#add_compile_options("-Werror")
 add_compile_options("-Wpedantic")
 add_compile_options("-Wno-unused-variable")
+add_compile_options("-Wunused-variable")
 add_compile_options("-Wno-uninitialized")
+
+# set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+# set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+# add_compile_options("-fsanitize=address")
+# add_compile_options("-O1")
+# add_compile_options("-fno-omit-frame-pointer")
+
 #add_compile_options("-v")
 
 # check for build in the source tree
