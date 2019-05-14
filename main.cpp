@@ -68,8 +68,6 @@ int main(){
   TVectorD x1 = TVectorD(3, x1_);
   TVectorD v1 = TVectorD(3, v1_);
   EMparticle * p1 = new EMparticle(206,79, x1, v1, true, false);
-  // std::cout<<"INVINCIBLE "<<p1->IsInvincible()<<endl;
-  // std::cout<<"RECORDING "<<p1->IsRecording()<<endl;
   eventT->AddParticle(p1);
 
   eventT->AddForce(cp);
@@ -100,10 +98,6 @@ int main(){
     TTree * tree = new TTree(TString::Format("TT_%d",j), "Rutherford Scattering Angle");
     Double_t   imp_tree;
     Int_t      NPOINT_tree;
-    // Double_t (*  x_tree) = nullptr;
-    // Double_t (*  y_tree) = nullptr;
-    // Double_t (* vx_tree) = nullptr;
-    // Double_t (* vy_tree) = nullptr;
     Double_t   vxF_tree;
     Double_t   vyF_tree;
     Double_t   SAngle_tree;
@@ -121,40 +115,19 @@ int main(){
 
 
     for(i=0; i<1 ;i++ ){
-      // cout<<"EVENT:"<<i<<endl;
+    for(i=0; i<1000000 ;i++ ){
       imp = RandomFloat(imp_min,imp_max);
       x2_[1] = imp;
       x2 = TVectorD(3,x2_);
       p2 = new EMparticle(4,2, x2, v2, false, true);
-      // cout<<"MAKE EVENT"<<endl;
       FTE->makeEvent(p2);
-      // FTE->getEvent()->DeriveMAX();
-      // for(j=0; j<MAXSTEPS; j++){
-      //   FTE->getEvent()->DeriveDT();
-      // }
-      // cout<<"DERIVATION"<<endl;
       FTE->getEvent()->DeriveMAX();
-      // cout<<"DERIVATION END"<<endl;
       imp_tree = imp;
       NPOINT_tree = p2->GetPath()->GetMaxNumber();
-      // x_tree =  (p2->GetPath()->GetAllX());
-      // y_tree =  (p2->GetPath()->GetAllY());
-      // vx_tree = (p2->GetPath()->GetAllVX());
-      // vy_tree =  (p2->GetPath()->GetAllVY());
       vxF_tree = p2->GetPath()->GetLastV().operator[](0);
       vyF_tree = p2->GetPath()->GetLastV().operator[](1);
       SAngle_tree = angleXD(p2->GetPath()->GetLastV());
-      // cout<<"ACCESS DATA END"<<endl;
-      // cout<<"FILLING TREE"<<endl;
       tree->Fill();
-      // cout<<"FILLING TREE END"<<endl;
-      // std::cout<<p2->IsInvincible()<<" :: "<<p2->GetX().operator[](0)<<"  "<<p2->GetX().operator[](1)<<" "<<p2->GetX().operator[](2)<<endl;
-      // std::cout<<"INIT"<<endl;
-      // p2->GetPath()->GetInitX().Print();
-      // p2->GetPath()->GetInitV().Print();
-      // std::cout<<"LAST"<<endl;
-      // p2->GetPath()->GetLastX().Print();
-      // p2->GetPath()->GetLastV().Print();
 
       if(i%1000==0){
         cout<<j<<"/"<<i<<":"<<imp_tree<<":"<<vxF_tree<<":"<<SAngle_tree<<endl;
@@ -164,19 +137,13 @@ int main(){
       cout<<p2->GetQ()<<endl;
       cout<<p1->GetM()<<endl;
       cout<<p2->GetM()<<endl;
-      // cout<<"OFF EVENT"<<endl;
       FTE->offEvent();
-      // cout<<"DELETE EVENT"<<endl;
       FTE->delEvent();
-      // cout<<"DELETE EVENT END"<<endl;
     }
     tree->Print();
     tree->AutoSave();
     hfile->Write();
     hfile->Close();
-    delete hfile;
-    // tree->Delete();
-    // cout<<"TREE DELETED"<<endl;
   }
 
 
