@@ -71,7 +71,7 @@ int main(int argc, char** argv){
   Double_t v1_[] = {0., 0., 0.};
   TVectorD x1 = TVectorD(3, x1_);
   TVectorD v1 = TVectorD(3, v1_);
-  EMparticle * p1 = new EMparticle(206,79, x1, v1, true, false);
+  EMparticle * p1 = new EMparticle(196,79, x1, v1, true, false);
 
   //event template
   eventT->AddParticle(p1);
@@ -219,7 +219,7 @@ int main(int argc, char** argv){
   TRandom3 * rg = new TRandom3(randseed);
 
   Int_t i;
-  for(i=0; i<1000 ;i++ ){
+  for(i=0; i<1000000 ;i++ ){
     RN_tree = i;
     x2_[0] = rg->Uniform(xmin, xmax);
     x2_[1] = rg->Uniform(ymin, ymax);
@@ -260,9 +260,10 @@ int main(int argc, char** argv){
       cout<<(argc>2?argv[2]:"0")<<"/"<<i<<" : DCA "<<DCAAB_tree<<"|"<<DCATA_tree<<","<<DCATB_tree<<" : TCA "<<TCAAB_tree<<"|"<<TCATA_tree<<","<<TCATB_tree<<endl;
       tree->AutoSave();
     }
+
+    MBE->offEvent();
+    MBE->delEvent();
   }
-  MBE->offEvent();
-  MBE->delEvent();
 
   tree->Print();
   cout<<"END PRODUCTION "<<(argc>2?argv[2]:"")<<endl;
