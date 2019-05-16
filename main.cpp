@@ -57,7 +57,15 @@ Double_t angleXD(TVectorD v){
   return result*(180./3.1415926535);
 }
 
-int main(){
+
+//Multifile inplemented
+//Arguments
+//1. exp name (default: test)
+//2. file number (default: 0)
+// Running Example 1: ./main 1         :: file will be FixedTarget79_2_4_1.root
+// Running Example 2: ./main  02       :: file will be FixedTarget79_2_4_02.root
+
+int main(int argc, char** argv){
 
   /* START OF EVENT Template Definition */
   /* Event Template */
@@ -112,72 +120,76 @@ int main(){
   Int_t i; // Produced Particle Number
   Int_t j=0; // Produced ROOT File Number
 
-  for(j=0;j<1;j++){
-
-    TFile * hfile = new TFile(TString::Format("Data/FixedTarget_%d.root",j),"RECREATE");
-    TTree * tree = new TTree(TString::Format("TT_%d",j), "Rutherford Scattering Angle");
-
-    // TREE Entry Properties
-    // for Each event, followings will be recorded.
-    // imp_tree: Impact Parameter
-    // NPOINT_tree: Number of points iterated.
-    // vxF_tree: Final VelocityX
-    // vyF_tree: Final VelocityY
-    // vyF_tree: Scattering Angle (calculated from vxF, vyF)
-
-    Double_t   imp_tree;
-    Int_t      NPOINT_tree;
-    Double_t   vxF_tree;
-    Double_t   vyF_tree;
-    Double_t   SAngle_tree;
-
-    tree->Branch("imp", &imp_tree, "imp/D");
-    tree->Branch("NPOINT", &NPOINT_tree, "Npoint/I");
-    // tree->Branch("x", x_tree, "x[Npoint]/D");
-    // tree->Branch("y", y_tree, "y[Npoint]/D");
-    // tree->Branch("vx", vx_tree, "vx[Npoint]/D");
-    // tree->Branch("vy", vy_tree, "vy[Npoint]/D");
-    tree->Branch("vxF", & vxF_tree, "vxF/D");
-    tree->Branch("vyF", & vyF_tree, "vyF/D");
-    tree->Branch("SAngle", & SAngle_tree, "angle/D");
 
 
+  //Tree data construction
+  //MultiTreading
+  TString rfilename;
 
-    for(i=0; i<1000000 ;i++ ){
-      //Start Single Event Production
-      //1. for Randomized Impact Parameter
-      imp = RandomFloat(imp_min,imp_max);
-      x2_[1] = imp;
-      x2 = TVectorD(3,x2_);
-      //Produce Particle with impact parameter
-      p2 = new EMparticle(4,2, x2, v2, false, true);
-      //make Event with projectile p2
-      FTE->makeEvent(p2);
-      FTE->getEvent()->DeriveMAX();
-      //take value from event
-      imp_tree = imp;
-      NPOINT_tree = p2->GetPath()->GetMaxNumber();
-      vxF_tree = p2->GetPath()->GetLastV().operator[](0);
-      vyF_tree = p2->GetPath()->GetLastV().operator[](1);
-      SAngle_tree = angleXD(p2->GetPath()->GetLastV());
-      tree->Fill();
-
-      if(i%1000==0){
-        cout<<j<<"/"<<i<<":"<<imp_tree<<":"<<vxF_tree<<":"<<SAngle_tree<<endl;
-      }
-
-      cout<<p1->GetQ()<<endl;
-      cout<<p2->GetQ()<<endl;
-      cout<<p1->GetM()<<endl;
-      cout<<p2->GetM()<<endl;
-      FTE->offEvent();
-      FTE->delEvent();
-    }
-    tree->Print();
-    tree->AutoSave();
-    hfile->Write();
-    hfile->Close();
+  if(argc==1){
+    rfilename = TString("Data/FixedTarget79_2_4_0.root");
+  }else if(argc==2){
+    rfilename = TString::Format("Data/FixedTarget79_2_4_%s.root", argv[1]);
   }
+
+  cout<<"SAVE DATA IN: "<<rfilename<<endl;
+  TFile * hfile = new TFile(rfilename,"RECREATE");
+  TTree * tree = new TTree("T_FixedGold", "Rutherford Scattering Angle");
+
+  // TREE Entry Properties
+  // for Each event, followings will be recorded.
+  // imp_tree: Impact Parameter
+  // NPOINT_tree: Number of points iterated.
+  // vxF_tree: Final VelocityX
+  // vyF_tree: Final VelocityY
+  // vyF_tree: Scattering Angle (calculated from vxF, vyF)
+
+  Double_t   imp_tree;
+  Int_t      NPOINT_tree;
+  Double_t   vxF_tree;
+  Double_t   vyF_tree;
+  Double_t   SAngle_tree;
+
+  tree->Branch("imp", &imp_tree, "imp/D");
+  tree->Branch("NPOINT", &NPOINT_tree, "Npoint/I");
+  // tree->Branch("x", x_tree, "x[Npoint]/D");
+  // tree->Branch("y", y_tree, "y[Npoint]/D");
+  // tree->Branch("vx", vx_tree, "vx[Npoint]/D");
+  // tree->Branch("vy", vy_tree, "vy[Npoint]/D");
+  tree->Branch("vxF", & vxF_tree, "vxF/D");
+  tree->Branch("vyF", & vyF_tree, "vyF/D");
+  tree->Branch("SAngle", & SAngle_tree, "SAngle/D");
+
+
+  for(i=0; i<10000; i++ ){
+    //Start Single Event Production
+    //1. for Randomized Impact Parameter
+    imp = RandomFloat(imp_min,imp_max);
+    x2_[1] = imp;
+    x2 = TVectorD(3,x2_);
+    //Produce Particle with impact parameter
+    p2 = new EMparticle(4,2, x2, v2, false, true);
+    //make Event with projectile p2
+    FTE->makeEvent(p2);
+    FTE->getEvent()->DeriveMAX();
+    //take value from event
+    imp_tree = imp;
+    NPOINT_tree = p2->GetPath()->GetMaxNumber();
+    vxF_tree = p2->GetPath()->GetLastV().operator[](0);
+    vyF_tree = p2->GetPath()->GetLastV().operator[](1);
+    SAngle_tree = angleXD(p2->GetPath()->GetLastV());
+    tree->Fill();
+
+    if(i%1000==0){
+      cout<<j<<"/"<<i<<":"<<imp_tree<<":"<<vxF_tree<<":"<<SAngle_tree<<endl;
+    }
+
+    FTE->offEvent();
+    FTE->delEvent();
+  }
+  tree->Print();
+  hfile->Write();
+  hfile->Close();
 
   return 0;
 
