@@ -115,7 +115,7 @@ int main(int argc, char** argv){
   Double_t v2_[] = {0.05,0.,0.}; // DEF,SET) Projectile Particle Initial Velocity (NumArray)
   v2 = TVectorD(3,v2_);          // SET) Projectile Particle Initial Velocity (Vector)
 
-  Double_t x2_[] = {-200., 0., 0.,}; // DEF,SET) Projectile Particle Initial Position (NumArray)
+  Double_t x2_[] = {-1000., 0., 0.,}; // DEF,SET) Projectile Particle Initial Position (NumArray)
 
   Int_t i; // Produced Particle Number
   Int_t j=0; // Produced ROOT File Number
@@ -186,6 +186,7 @@ int main(int argc, char** argv){
 
     FTE->offEvent();
     FTE->delEvent();
+    tree->AutoSave();
   }
   tree->Print();
   hfile->Write();
