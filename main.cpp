@@ -11,6 +11,8 @@
 #include "TTree.h"
 #include "TFile.h"
 
+#include "TRandom3.h"
+
 
 using namespace std;
 
@@ -37,12 +39,12 @@ void FixedTargetExperiment::makeEvent(particle* p){
 }
 
 
-Float_t RandomFloat(Float_t a, Float_t b) {
-    Float_t random = ((Float_t) rand()) / (Float_t) RAND_MAX;
-    Float_t diff = b - a;
-    Float_t r = random * diff;
-    return a + r;
-}
+// Float_t RandomFloat(Float_t a, Float_t b) {
+//     Float_t random = ((Float_t) rand()) / (Float_t) RAND_MAX;
+//     Float_t diff = b - a;
+//     Float_t r = random * diff;
+//     return a + r;
+// }
 
 TVectorD unitv(TVectorD v){
   TVectorD result = TVectorD(3);
@@ -161,10 +163,16 @@ int main(int argc, char** argv){
   tree->Branch("SAngle", & SAngle_tree, "SAngle/D");
 
 
-  for(i=0; i<10000; i++ ){
+  //Random Generator Setup
+  unsigned int randseed = (unsigned int) time(NULL);
+  TRandom3 * rg = new TRandom3(randseed);
+  tree->Branch("RSeed", & randseed, "RSeed/D");
+  tree->Branch("RIter", & i, "RIter/D");
+
+  for(i=0; i<1000000; i++ ){
     //Start Single Event Production
     //1. for Randomized Impact Parameter
-    imp = RandomFloat(imp_min,imp_max);
+    imp = rg->Uniform(imp_min,imp_max);
     x2_[1] = imp;
     x2 = TVectorD(3,x2_);
     //Produce Particle with impact parameter
