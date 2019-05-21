@@ -169,7 +169,7 @@ int main(int argc, char** argv){
   tree->Branch("RSeed", & randseed, "RSeed/D");
   tree->Branch("RIter", & i, "RIter/D");
 
-  for(i=0; i<100000; i++ ){
+  for(i=0; i<10000; i++ ){
     //Start Single Event Production
     //1. for Randomized Impact Parameter
     imp = rg->Uniform(imp_min,imp_max);
