@@ -18,7 +18,7 @@
 class MBodyExperiment{
 public:
   void setTemplate(event* eventT_){eventT=eventT_;}
-  void makeEvent(particle* p1, particle* p2); // if event already on,
+  void makeEvent(particle* p1, particle* p2);
   void offEvent(){eventOn=false;}
   void delEvent(){eventOn=false; delete currentEvent;}
   event* getEvent(){return currentEvent;}
