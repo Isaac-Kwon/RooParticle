@@ -3,7 +3,8 @@ set(TEST_EXE_ROOT
   test_print
   test_rutherford
   test_collider_HeHe
-  test_3body
+  test_3body_uniform
+  test_3body_approx
 )
 
 # for now put the executables in the build root
