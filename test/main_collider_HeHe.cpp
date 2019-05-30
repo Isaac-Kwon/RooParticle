@@ -112,7 +112,7 @@ int main(int argc, char** argv){
   Double_t   DCA;
   Double_t   outtime;
 
-  tree->Branch("imp", &imp, "imp/D");
+  tree->Branch("imp", &imp, "imp/F");
   tree->Branch("NPOINT", &NPOINT, "Npoint/I");
   tree->Branch("x1", & vx1, "x1/D");
   tree->Branch("x2", & vx2, "x2/D");
@@ -146,7 +146,7 @@ int main(int argc, char** argv){
     tree->Fill();
 
     if(i%100==0){
-      cout<<findex<<endl<<":"<<"/"<<i<<":"<<imp<<":"<<SAngle1<<":"<<SAngle2<<":"<<DCA<<":"<<outtime<<endl;
+      cout<<findex<<":"<<"/"<<i<<":"<<imp<<":"<<SAngle1<<":"<<SAngle2<<":"<<DCA<<":"<<outtime<<endl;
       cout<<"LAST POS P1: "<<p1->GetPath()->GetLastX()[0]<<endl;
       cout<<"LAST POS P2: "<<p2->GetPath()->GetLastX()[0]<<endl;
       tree->AutoSave();
