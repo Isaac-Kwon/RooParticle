@@ -37,14 +37,14 @@ void MBodyExperiment::makeEvent(particle* p1, particle* p2){
 }
 
 
-TVectorD unitv(TVectorD v){
-  TVectorD result = TVectorD(3);
-  result = v*(1/sqrt(v.Norm2Sqr()));
+TVector3 unitv(TVector3 v){
+  TVector3 result = TVector3();
+  result = v*(1/v.Mag());
   return result;
 }
 
-Double_t angleXD(TVectorD v){
-  TVectorD unit = TVectorD(3);
+Double_t angleXD(TVector3 v){
+  TVector3 unit = TVector3();
   unit = unitv(v);
   Double_t result = acos(unit[0]);
   return result*(180./3.1415926535);
@@ -69,8 +69,8 @@ int main(int argc, char** argv){
   //fixed target definition
   Double_t x1_[] = {0., 0., 0.};
   Double_t v1_[] = {0., 0., 0.};
-  TVectorD x1 = TVectorD(3, x1_);
-  TVectorD v1 = TVectorD(3, v1_);
+  TVector3 x1 = TVector3(x1_);
+  TVector3 v1 = TVector3(v1_);
   EMparticle * p1 = new EMparticle(196,79, x1, v1, true, false);
 
   //event template
@@ -86,10 +86,10 @@ int main(int argc, char** argv){
   MBodyExperiment * MBE = new MBodyExperiment();
   MBE->setTemplate(eventT); //template input
 
-  TVectorD x2 = TVectorD(3);
-  TVectorD v2 = TVectorD(3);
-  TVectorD x3 = TVectorD(3);
-  TVectorD v3 = TVectorD(3);
+  TVector3 x2 = TVector3();
+  TVector3 v2 = TVector3();
+  TVector3 x3 = TVector3();
+  TVector3 v3 = TVector3();
 
   //Square source
   Float_t impactLX = 1000;
@@ -114,8 +114,8 @@ int main(int argc, char** argv){
 
   Double_t v2_[] = { 0., 0. , -0.05 };
   Double_t v3_[] = { 0., 0. , 0.05 };
-  v2 = TVectorD(3,v2_);
-  v3 = TVectorD(3,v3_);
+  v2 = TVector3(v2_);
+  v3 = TVector3(v3_);
 
   //Tree data construction
 
@@ -223,12 +223,12 @@ int main(int argc, char** argv){
     RN_tree = i;
     x2_[0] = rg->Uniform(xmin, xmax);
     x2_[1] = rg->Uniform(ymin, ymax);
-    x2 = TVectorD(3,x2_);
+    x2 = TVector3(x2_);
     p2 = new EMparticle(4,2, x2, v2, false, true);
 
     x3_[0] = rg->Uniform(xmin, xmax);
     x3_[1] = rg->Uniform(ymin, ymax);
-    x3 = TVectorD(3,x3_);
+    x3 = TVector3(x3_);
     p3 = new EMparticle(4,2, x3, v3, false, true);
 
     MBE->makeEvent(p2, p3);

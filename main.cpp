@@ -46,14 +46,14 @@ void FixedTargetExperiment::makeEvent(particle* p){
 //     return a + r;
 // }
 
-TVectorD unitv(TVectorD v){
-  TVectorD result = TVectorD(3);
-  result = v*(1/sqrt(v.Norm2Sqr()));
+TVector3 unitv(TVector3 v){
+  TVector3 result = TVector3();
+  result = v.Unit();
   return result;
 }
 
-Double_t angleXD(TVectorD v){
-  TVectorD unit = TVectorD(3);
+Double_t angleXD(TVector3 v){
+  TVector3 unit = TVector3();
   unit = unitv(v);
   Double_t result = acos(unit[0]);
   return result*(180./3.1415926535);
@@ -89,8 +89,8 @@ int main(int argc, char** argv){
 
   Double_t x1_[] = {0., 0., 0.};
   Double_t v1_[] = {0., 0., 0.};
-  TVectorD x1 = TVectorD(3, x1_);
-  TVectorD v1 = TVectorD(3, v1_);
+  TVector3 x1 = TVector3(x1_);
+  TVector3 v1 = TVector3(v1_);
   EMparticle * p1 = new EMparticle(197,79, x1, v1, true, false);
 
   eventT->AddParticle(p1);
@@ -105,8 +105,8 @@ int main(int argc, char** argv){
   FTE->setTemplate(eventT); // Set Event Tempate with defined template
 
   /* START OF PROJECTILE PARTICLE DEFINITION */
-  TVectorD x2 = TVectorD(3); // DEF) Projectile Particle Initial Position (Vector)
-  TVectorD v2 = TVectorD(3); // DEF) Projectile Particle Initial Velocity (Vector)
+  TVector3 x2 = TVector3(); // DEF) Projectile Particle Initial Position (Vector)
+  TVector3 v2 = TVector3(); // DEF) Projectile Particle Initial Velocity (Vector)
 
   Float_t imp_min = 0.;      // DEF,SET) Projectile Particle Minimum Impact Parameter
   Float_t imp_max = +1000.;  // DEF,SET) Projectile Particle Maximum Impact Parameter
@@ -115,7 +115,7 @@ int main(int argc, char** argv){
   EMparticle * p2;           // DEF)     Projectile Particle
 
   Double_t v2_[] = {0.05,0.,0.}; // DEF,SET) Projectile Particle Initial Velocity (NumArray)
-  v2 = TVectorD(3,v2_);          // SET) Projectile Particle Initial Velocity (Vector)
+  v2 = TVector3(v2_);          // SET) Projectile Particle Initial Velocity (Vector)
 
   Double_t x2_[] = {-1000., 0., 0.,}; // DEF,SET) Projectile Particle Initial Position (NumArray)
 
@@ -174,7 +174,7 @@ int main(int argc, char** argv){
     //1. for Randomized Impact Parameter
     imp = rg->Uniform(imp_min,imp_max);
     x2_[1] = imp;
-    x2 = TVectorD(3,x2_);
+    x2 = TVector3(x2_);
     //Produce Particle with impact parameter
     p2 = new EMparticle(4,2, x2, v2, false, true);
     //make Event with projectile p2

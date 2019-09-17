@@ -44,14 +44,14 @@ Float_t RandomFloat(Float_t a, Float_t b) {
     return a + r;
 }
 
-TVectorD unitv(TVectorD v){
-  TVectorD result = TVectorD(3);
-  result = v*(1/sqrt(v.Norm2Sqr()));
+TVector3 unitv(TVector3 v){
+  TVector3 result = TVector3();
+  result = v*(1/(v.Mag()));
   return result;
 }
 
-Double_t angleXD(TVectorD v){
-  TVectorD unit = TVectorD(3);
+Double_t angleXD(TVector3 v){
+  TVector3 unit = TVector3();
   unit = unitv(v);
   Double_t result = acos(unit[0]);
   return result*(180./3.1415926535);
@@ -65,8 +65,8 @@ int main(){
 
   Double_t x1_[] = {0., 0., 0.};
   Double_t v1_[] = {0., 0., 0.};
-  TVectorD x1 = TVectorD(3, x1_);
-  TVectorD v1 = TVectorD(3, v1_);
+  TVector3 x1 = TVector3(x1_);
+  TVector3 v1 = TVector3(v1_);
   EMparticle * p1 = new EMparticle(206,79, x1, v1, true, false);
 
   eventT->AddParticle(p1);
@@ -76,8 +76,8 @@ int main(){
   FixedTargetExperiment * FTE = new FixedTargetExperiment();
   FTE->setTemplate(eventT);
 
-  TVectorD x2 = TVectorD(3);
-  TVectorD v2 = TVectorD(3);
+  TVector3 x2 = TVector3();
+  TVector3 v2 = TVector3();
 
   Float_t imp_min = 0.;
   Float_t imp_max = +1000.;
@@ -86,7 +86,7 @@ int main(){
   EMparticle * p2;
 
   Double_t v2_[] = {0.05,0.,0.};
-  v2 = TVectorD(3,v2_);
+  v2 = TVector3(v2_);
 
   Double_t x2_[] = {-1000., 0., 0.,};
 
@@ -117,7 +117,7 @@ int main(){
     for(i=0; i<1000 ;i++ ){
       imp = RandomFloat(imp_min,imp_max);
       x2_[1] = imp;
-      x2 = TVectorD(3,x2_);
+      x2 = TVector3(x2_);
       p2 = new EMparticle(4,2, x2, v2, false, true);
 
       FTE->makeEvent(p2);
