@@ -45,3 +45,6 @@ test/Data/*
 test/main_private*
 doc
 .pre-commit-clang-format
+
+*.vscode
+*.code-workspace
