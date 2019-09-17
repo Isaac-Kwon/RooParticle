@@ -3,44 +3,49 @@
 
 #include "TROOT.h"
 #include "RPConfig.hpp"
+#include "TVector3.h"
+#include "iostream"
+
+#include "list"
+
+using namespace std;
 
 class path{
 public:
+  path();
+  path(path& path_);
   ~path();
-  Int_t AddRecord(TVectorD x_, TVectorD v_, Double_t time=-1.);
-  TVectorD GetRecordX(Int_t i);
-  TVectorD GetRecordV(Int_t i);
-  TVectorD GetInitX();
-  TVectorD GetInitV();
-  TVectorD GetLastX();
-  TVectorD GetLastV();
-  Int_t    GetMaxNumber(){return writingCursor;};
-  Double_t * GetAllX(){return x;}
-  Double_t * GetAllY(){return y;}
-  Double_t * GetAllZ(){return z;}
-  Double_t * GetAllVX(){return vx;}
-  Double_t * GetAllVY(){return vy;}
-  Double_t * GetAllVZ(){return vz;}
-  void     GetDCA(const TVectorD pos, Double_t & DCA, Double_t & outtime, Bool_t verbose=false);
+  void AddRecord(TVector3 x_, TVector3 v_, Double_t time_);
+
+  TVector3 GetRecordX(Int_t i);
+  TVector3 GetRecordV(Int_t i);
+  Double_t GetRecordT(Int_t i);
+  void     GetRecord(Int_t i, TVector3 & x_, TVector3 & v_, Double_t & t_);
+
+  TVector3 GetInitX();
+  TVector3 GetInitV();
+  Double_t GetInitT();
+  void     GetInit(TVector3 & x_, TVector3 & v_, Double_t & t_);
+
+  TVector3 GetLastX();
+  TVector3 GetLastV();
+  Double_t GetLastT();
+  void     GetLast(TVector3 & x_, TVector3 & v_, Double_t & t_);
+
+  void     GetDCA(const TVector3 pos, Double_t & DCA, Double_t & outtime, Bool_t verbose=false);
   void     GetDCA(path* timepath, Double_t & DCA, Double_t & outtime, Bool_t verbose=false);
-  // Double_t GetDCA(const TVectorD pos);
+  Long64_t GetMaxNumber(){return t.size();}
+  // Double_t GetDCA(const TVector3 pos);
   // Double_t GetDCA(path* timepath);
 protected:
-private:
-  Int_t writingCursor = 0;
-
-  Double_t * t = new Double_t[MAXSTEPS];
-
-  Double_t * x = new Double_t[MAXSTEPS];
-  Double_t * y = new Double_t[MAXSTEPS];
-  Double_t * z = new Double_t[MAXSTEPS];
-
-  Double_t * vx = new Double_t[MAXSTEPS];
-  Double_t * vy = new Double_t[MAXSTEPS];
-  Double_t * vz = new Double_t[MAXSTEPS];
-
   Bool_t lengthChk(path* target);
   Bool_t timeChk(path* target);
+
+private:
+  // Int_t writingCursor = 0;
+  std::vector<TVector3>  pos;
+  std::vector<TVector3>  vel;
+  std::vector<Double_t>  t;
 };
 
 #endif

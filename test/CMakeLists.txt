@@ -5,6 +5,7 @@ set(TEST_EXE_ROOT
   test_collider_HeHe
   test_3body_uniform
   test_3body_uniaxis
+  test_preEventTest
 )
 
 # for now put the executables in the build root

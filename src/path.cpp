@@ -1,104 +1,157 @@
 #include "TROOT.h"
-#include "TVectorD.h"
+#include "TVector3.h"
 
 #include "path.hpp"
+#include "list"
 #include "iostream"
 
 #include <math.h>
 
 using namespace std;
 
+path::path(){
+}
+
+path::path(path& path_){
+  std::vector<TVector3>::iterator i1;
+  std::vector<Double_t>::iterator i2;
+
+  for(i1=path_.pos.begin();i1!=path_.pos.end();++i1){
+    pos.push_back(*i1);
+  }
+
+  for(i1=path_.vel.begin();i1!=path_.vel.end();++i1){
+    vel.push_back(*i1);
+  }
+
+    for(i2=path_.t.begin();i2!=path_.t.end();++i2){
+    t.push_back(*i2);
+  }
+}
+
 path::~path(){
-  delete[] t;
+  pos.clear();
+  vel.clear();
+  t.clear();
 
-  delete[] x;
-  delete[] y;
-  delete[] z;
-
-  delete[] vx;
-  delete[] vy;
-  delete[] vz;
+  // pos.shrink_to_fit();
+  // vel.shrink_to_fit();
+  // t.shrink_to_fit();
 }
 
-Int_t path::AddRecord(TVectorD x_, TVectorD v_, Double_t time_){
-  x[writingCursor] = x_[0];
-  y[writingCursor] = x_[1];
-  z[writingCursor] = x_[2];
-
-  vx[writingCursor] = v_[0];
-  vy[writingCursor] = v_[1];
-  vz[writingCursor] = v_[2];
-
-  t[writingCursor] = time_;
-
-  writingCursor++;
-  // std::cout<<"recorded"<<endl;
-  return writingCursor-1;
+void path::AddRecord(TVector3 x_, TVector3 v_, Double_t time_=-1.){
+  pos.push_back(x_);
+  vel.push_back(v_);
+  t.push_back(time_);
 }
 
-TVectorD path::GetRecordX(Int_t i){
-  if (writingCursor==0 || i>writingCursor){
+TVector3 path::GetRecordX(Int_t i){
+  if (pos.size()==0 || pos.size()<=i){
     std::cout<<"NO ANY VALUES, RETURN NULL VECTOR"<<endl;
-    return TVectorD(0);
+    return TVector3();
   }
-  Double_t result_[] = {x[i],y[i],z[i]};
-  TVectorD result = TVectorD(3, result_);
-  return result;
+  return pos[i];
 }
 
-TVectorD path::GetRecordV(Int_t i){
-  if (writingCursor==0 || i>writingCursor){
+TVector3 path::GetRecordV(Int_t i){
+  if (vel.size()==0 || vel.size()<=i){
     std::cout<<"NO ANY VALUES, RETURN NULL VECTOR"<<endl;
-    return TVectorD(0);
+    return TVector3();
   }
-  Double_t result_[] = {vx[i],vy[i],vz[i]};
-  TVectorD result = TVectorD(3, result_);
-  return result;
+  return vel[i];
 }
 
-TVectorD path::GetInitX(){
-  if (writingCursor==0){
+Double_t path::GetRecordT(Int_t i){
+  if (t.size()==0 || t.size()<=i){
+    std::cout<<"NO ANY VALUES, RETURN NULL VALUE"<<endl;
+    return Double_t(0.);
+  }
+  return t[i];
+}
+
+void path::GetRecord(Int_t i,
+                     TVector3 & x_, TVector3 & v_,
+                     Double_t & t_){
+  x_ = GetRecordX(i);
+  v_ = GetRecordV(i);
+  t_ = GetRecordT(i);
+  return;
+}
+
+TVector3 path::GetInitX(){
+  if (pos.size()==0){
     std::cout<<"NO ANY VALUES, RETURN NULL VECTOR"<<endl;
-    return TVectorD(0);
+    return TVector3();
   }
-  return GetRecordX(0);
+  return pos.front();
 }
 
-TVectorD path::GetInitV(){
-  if (writingCursor==0){
+TVector3 path::GetInitV(){
+  if (vel.size()==0){
     std::cout<<"NO ANY VALUES, RETURN NULL VECTOR"<<endl;
-    return TVectorD(0);
+    return TVector3();
   }
-  return GetRecordV(0);
+  return vel.front();
 }
 
-TVectorD path::GetLastX(){
-  if (writingCursor==0){
+Double_t path::GetInitT(){
+  if (t.size()==0){
+    std::cout<<"NO ANY VALUES, RETURN ZERO VALUE"<<endl;
+    return Double_t(0.);
+  }
+  return t.front();
+}
+
+void path::GetInit(TVector3 & x_, TVector3 & v_,
+                   Double_t & t_){
+  x_ = GetInitX();
+  v_ = GetInitV();
+  t_ = GetInitT();
+  return;
+}
+
+TVector3 path::GetLastX(){
+  if (pos.size()==0){
     std::cout<<"NO ANY VALUES, RETURN NULL VECTOR"<<endl;
-    return TVectorD(0);
+    return TVector3();
   }
-  return GetRecordX(writingCursor-1);
+  return pos.back();
 }
 
-TVectorD path::GetLastV(){
-  if (writingCursor==0){
+TVector3 path::GetLastV(){
+  if (vel.size()==0){
     std::cout<<"NO ANY VALUES, RETURN NULL VECTOR"<<endl;
-    return TVectorD(0);
+    return TVector3();
   }
-  return GetRecordV(writingCursor-1);
+  return vel.back();
 }
 
-// TVectorD path::GetCloestPosition()
+Double_t path::GetLastT(){
+  if (t.size()==0){
+    std::cout<<"NO ANY VALUES, RETURN ZERO VALUE"<<endl;
+    return Double_t(0.);
+  }
+  return t.back();
+}
 
-void path::GetDCA(const TVectorD pos, Double_t & DCA, Double_t & outtime, Bool_t verbose){
+void path::GetLast(TVector3 & x_, TVector3 & v_,
+                   Double_t & t_){
+  x_ = GetLastX();
+  v_ = GetLastV();
+  t_ = GetLastT();
+  return;
+}
+
+void path::GetDCA(const TVector3 pos_, Double_t & DCA, Double_t & outtime, Bool_t verbose){
   Int_t i;
   Double_t resultDCA=std::numeric_limits<double>::max();
   Double_t tempDCA=-2.;
   Int_t resultTI=-1;
-  TVectorD tempvector = TVectorD(3);
-  for(i=0; i<writingCursor; i++){
-    tempvector = pos-GetRecordX(i);
-    tempDCA = sqrt(tempvector.Norm2Sqr());
+  TVector3 tempvector;
+  for(std::vector<TVector3>::iterator it = pos.begin();
+      it != pos.end(); ++it){
+    tempvector = (*it)-GetRecordX(i);
+    tempDCA = tempvector.Mag();
     if(tempDCA<resultDCA){
       resultDCA = tempDCA;
       resultTI = i;
@@ -116,15 +169,15 @@ void path::GetDCA(path* timepath, Double_t & DCA, Double_t & outtime, Bool_t ver
     return;
   }
 
-  Int_t i;
   Double_t resultDCA=std::numeric_limits<double>::max();
   Double_t tempDCA=-2.;
   Int_t resultTI=-1;
-  TVectorD tempvector = TVectorD(3);
+  TVector3 tempvector;
 
-  for(i=0; i<writingCursor; i++){
+  Int_t i;
+  for(i=0; i<pos.size(); ++i){
     tempvector = (timepath->GetRecordX(i))-GetRecordX(i);
-    tempDCA = sqrt(tempvector.Norm2Sqr());
+    tempDCA = tempvector.Mag();
     if(tempDCA<resultDCA){
       resultDCA = tempDCA;
       resultTI = i;
@@ -137,21 +190,20 @@ void path::GetDCA(path* timepath, Double_t & DCA, Double_t & outtime, Bool_t ver
 Bool_t path::lengthChk(path* target){
   if(GetMaxNumber()!=target->GetMaxNumber()){
     std::cout<<"LENGTH CHK ERROR (NOT SAME)"<<endl;
-    return false;
+    return kFALSE;
   }
   else{
-    return true;
+    return kTRUE;
   }
 }
 
 Bool_t path::timeChk(path* target){
-  if(!lengthChk(target)){
-    return false;
+  if(!lengthChk(target)){ 
+    return kFALSE;
   }
-
   Int_t i;
-  for(i=0; i< target->GetMaxNumber();i++){
-    if(target->t[i]!=t[i]){
+  for(i=0; i<target->GetMaxNumber(); i++){
+    if(target->GetRecordT(i)!=GetRecordT(i)){
       std::cout<<"TIME CHK ERROR: "<< i << endl;
       return false;
     }

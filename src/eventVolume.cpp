@@ -1,6 +1,5 @@
 #include "TROOT.h"
-#include "TVectorT.h"
-#include "TVectorD.h"
+#include "TVector3.h"
 #include "eventVolume.hpp"
 
 eventVolume::eventVolume(){
@@ -10,12 +9,12 @@ eventVGeneral::eventVGeneral(Double_t xmin, Double_t xmax,
                              Double_t ymin, Double_t ymax,
                              Double_t zmin, Double_t zmax): eventVolume(){
   // Double_t bottom_[] = {xmin, ymin, zmin};
-  // bottom = TVectorD(3, bottom_);
+  // bottom = TVector3(3, bottom_);
   bottom[0] = xmin;
   bottom[1] = ymin;
   bottom[2] = zmin;
   // Double_t top_[] = {xmax, ymax, zmax};
-  // top = TVectorD(3, top_);
+  // top = TVector3(3, top_);
   top[0] = xmax;
   top[1] = ymax;
   top[2] = zmax;
@@ -30,7 +29,7 @@ eventVGeneral::eventVGeneral(Double_t xlen,
                 -1*zlen/2, zlen/2);
 }
 
-Bool_t eventVGeneral::Inside(TVectorD position){
+Bool_t eventVGeneral::Inside(TVector3 position){
   Double_t x, y, z;
   x = position[0];
   y = position[1];
