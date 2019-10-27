@@ -1,10 +1,8 @@
 
 set(TEST_EXE_ROOT
-  test_print
   test_rutherford
   test_collider_HeHe
   test_3body_uniform
-  test_3body_uniaxis
   test_preEventTest
 )
 

@@ -1,3 +1,10 @@
+////////////////////////////////////////////
+// 
+// RooParticle Test Application
+// 3 Body Uniform Distribution
+// 
+////////////////////////////////////////////
+
 #include "TROOT.h"
 #include "RPConfig.hpp"
 
@@ -49,13 +56,6 @@ Double_t angleXD(TVector3 v){
   Double_t result = acos(unit[0]);
   return result*(180./3.1415926535);
 }
-
-//Multifile inplemented
-//Arguments
-//1. exp name (default: test)
-//2. file number (default: 0)
-// Running Example 1: ./test_3body test 1
-// Running Example 2: ./test_3body test 02
 
 int main(int argc, char** argv){
 
@@ -166,14 +166,6 @@ int main(int argc, char** argv){
   Double_t   TCATB_tree;
   Double_t   TCAAB_tree;
 
-  // Double_t * x1p_tree;
-  // Double_t * y1p_tree;
-  // Double_t * z1p_tree;
-
-  // Double_t * x2p_tree;
-  // Double_t * y2p_tree;
-  // Double_t * z2p_tree;
-
   Double_t   outtime_free;
   Int_t      RN_tree;
 
@@ -219,7 +211,7 @@ int main(int argc, char** argv){
   TRandom3 * rg = new TRandom3(randseed);
 
   Int_t i;
-  for(i=0; i<1000000 ;i++ ){
+  for(i=0; i<10 ;i++ ){
     RN_tree = i;
     x2_[0] = rg->Uniform(xmin, xmax);
     x2_[1] = rg->Uniform(ymin, ymax);
@@ -233,6 +225,7 @@ int main(int argc, char** argv){
 
     MBE->makeEvent(p2, p3);
     MBE->getEvent()->DeriveMAX();
+    // MBE->getEvent()->DeriveDTN(10);
 
     sx1_tree  = x2_[0];
     sy1_tree  = x2_[1];
@@ -265,7 +258,7 @@ int main(int argc, char** argv){
     MBE->delEvent();
   }
 
-  tree->Print();
+  // tree->Print();
   cout<<"END PRODUCTION "<<(argc>2?argv[2]:"")<<endl;
   tree->AutoSave();
   hfile->Close();

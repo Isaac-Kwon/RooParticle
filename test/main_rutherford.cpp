@@ -1,3 +1,10 @@
+////////////////////////////////////////////
+// 
+// RooParticle Test Application
+// (Fixed Target) Rutherford Experiment
+// 
+////////////////////////////////////////////
+
 #include "RPConfig.hpp"
 
 #include "event.hpp"
@@ -10,12 +17,6 @@
 #include "TROOT.h"
 #include "TTree.h"
 #include "TFile.h"
-
-
-using namespace std;
-
-// Test::Rutherford Scattering Tress Analysis
-
 class FixedTargetExperiment{
 public:
   void setTemplate(event* eventT_){eventT=eventT_;}
@@ -114,7 +115,7 @@ int main(){
 
 
 
-    for(i=0; i<1000 ;i++ ){
+    for(i=0; i<100 ;i++ ){
       imp = RandomFloat(imp_min,imp_max);
       x2_[1] = imp;
       x2 = TVector3(x2_);
@@ -133,7 +134,7 @@ int main(){
       tree->Fill();
 
       if(i%50==0){
-        cout<<j<<"/"<<i<<":"<<imp_tree<<":"<<vxF_tree<<":"<<SAngle_tree<<":"<<DCA_tree<<":"<<outtime_free<<endl;
+        std::cout<<j<<"/"<<i<<":"<<imp_tree<<":"<<vxF_tree<<":"<<SAngle_tree<<":"<<DCA_tree<<":"<<outtime_free<<endl;
       }
       FTE->offEvent();
       FTE->delEvent();
