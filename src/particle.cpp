@@ -91,6 +91,8 @@ void particle::applyForce(const TVector3 f, const Double_t dt){
   etime += dt;
   if(Record==true){
     // cout<<"RECORD"<<endl;
+    // x.Print();
+    // v.Print();
     ppath->AddRecord(x,v, etime);
     // cout<<"RECORD E"<<endl;
     }
@@ -135,11 +137,7 @@ TString particle::Print(Bool_t onlymechanic, Bool_t mute){
 
   if(!mute){
     cout<<result<<endl;
-    
-
   }
 
-  return result;
-
-  
+  return result;  
 }

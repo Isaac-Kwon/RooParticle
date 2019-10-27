@@ -16,7 +16,6 @@
 #include "event.hpp"
 #include "inspector.hpp"
 
-//General Constructor (Not Include any procedure)
 event::event(){
 }
 
@@ -86,22 +85,14 @@ void event::DeriveDT(Double_t dt){
   // cout<<"FROM "<<*particles.begin()<<" TO "<<*particles.end()<<endl;
   for(p1_=particles.begin(); p1_!=particles.end(); p1_++){
     p1 = *p1_;
-    // cout<<p1<<endl;
     for(p2_=particles.begin(); p2_!=particles.end(); p2_++){
-      // cout<<"EVALUATING "<<p1<<" and "<<p2<<endl;
       p2 = *p2_;
       if(p1==p2){
         continue;
       }
       for(ff_=forces.begin(); ff_!=forces.end(); ff_++){
-        // ff = &ff_;
-        // std::cout<<"FORCEPSTART"<<endl;
         ff = *ff_;
-        // std::cout<<"FORCESTART"<<endl;
-        // ff->Evaluate(p1, p2).Print();
         tempforce = ff->Evaluate(p1, p2);
-        // std::cout<<"HOLD FORCE"<<endl;
-        // tempforce.Print();
         p1->holdForce(tempforce);
       }
     }
@@ -110,9 +101,7 @@ void event::DeriveDT(Double_t dt){
   for(pp_=particles.begin(); pp_!=particles.end(); pp_++){
     pp = *pp_;
     pp->releaseForce(dt);
-    // cout<<"RELEASE"<<endl;
   }
-  // cout<<"END"<<endl;
   return;
 }
 
@@ -150,6 +139,25 @@ particle * event::getParticle(Int_t index){
     i++;
   }
   return p1;
+}
+
+force * event::getForce(Int_t index){
+  vector<force*>::iterator f1_;
+  force* f1;
+
+  Int_t i=0;
+  if(index >= getNForce()){
+    std::cerr<<"CALL Force ERROR:: Index over NForce"<<endl;
+    return 0;
+  }
+  for(f1_=forces.begin(); f1_!=forces.end(); f1_++){
+    f1 = *f1_;
+    if(i==index){
+      return f1;
+    }
+    i++;
+  }
+  return f1;
 }
 
 void event::preDerive(){
