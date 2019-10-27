@@ -211,7 +211,7 @@ int main(int argc, char** argv){
   TRandom3 * rg = new TRandom3(randseed);
 
   Int_t i;
-  for(i=0; i<10 ;i++ ){
+  for(i=0; i<100 ;i++ ){
     RN_tree = i;
     x2_[0] = rg->Uniform(xmin, xmax);
     x2_[1] = rg->Uniform(ymin, ymax);
