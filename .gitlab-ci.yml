@@ -12,7 +12,6 @@ cache:
 build:
     stage: build
     script:
-        - export
         - source /~/~/root6/root/bin/thisroot.sh
         - mkdir build
         - (cd build && cmake3 ../ && make -j9)
@@ -20,7 +19,6 @@ build:
 test:
     stage: test
     script:
-        - pwd && ls
         - source /~/~/root6/root/bin/thisroot.sh
         - (cd build && ./test_rutherford)
         - (cd build && ./test_collider_HeHe)
