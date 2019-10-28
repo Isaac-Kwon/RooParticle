@@ -4,6 +4,9 @@ stages:
   - build
   - test
 
+cache:
+ - ~/
+
 build:
     stage: build
     script:
