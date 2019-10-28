@@ -78,13 +78,13 @@ void event::DeriveDT(Double_t dt){
   vector<force*>::iterator    ff_;
   vector<particle*>::iterator pp_;
 
-  particle *pp, *p1, *p2;
+  particle *p1, *p2;
   force *ff;
 
   TVector3 tempforce = TVector3();
-  // cout<<"FROM "<<*particles.begin()<<" TO "<<*particles.end()<<endl;
   for(p1_=particles.begin(); p1_!=particles.end(); p1_++){
     p1 = *p1_;
+    if(p1->IsInvincible()) continue;
     for(p2_=particles.begin(); p2_!=particles.end(); p2_++){
       p2 = *p2_;
       if(p1==p2){
@@ -99,8 +99,7 @@ void event::DeriveDT(Double_t dt){
   }
 
   for(pp_=particles.begin(); pp_!=particles.end(); pp_++){
-    pp = *pp_;
-    pp->releaseForce(dt);
+    (*pp_)->releaseForce(dt);
   }
   return;
 }
