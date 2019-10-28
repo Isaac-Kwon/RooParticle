@@ -7,7 +7,7 @@ stages:
 cache:
  paths:
    - /builds/mkwon/RooParticle/build
- key: "$CI_JOB_STAGE-$CI_COMMIT_REF_SLUG"
+ key: ${CI_COMMIT_REF_SLUG}
 
 build:
     stage: build
