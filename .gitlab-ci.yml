@@ -14,7 +14,7 @@ build:
     stage: build
     script:
         - echo "push comment to " https://gitlab.cern.ch/api/v4/projects/${CI_PROJECT_PATH//\//%2F}/repository/commits/$CI_BUILD_REF/comments
-        - .gitlab/test_comment.sh
+        - sh .gitlab/test_comment.sh
         - source /~/~/root6/root/bin/thisroot.sh
         - mkdir build
         - (cd build && cmake3 ../ && make -j9)
