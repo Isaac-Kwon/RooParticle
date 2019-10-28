@@ -1,14 +1,18 @@
 image: gitlab-registry.cern.ch/mkwon/rooparticle:latest
 
-Build_Test:
+stages:
+  - build
+  - test
+
+build:
     script:
-        - source /~/~/root6/root/bin/thisroot.sh
+        - source ~/root6/root/bin/thisroot.sh
         - mkdir build
         - (cd build && cmake3 ../ && make -j9)
 
-Running_Test:
+test:
     script:
-        - source /~/~/root6/root/bin/thisroot.sh
+        - source ~/root6/root/bin/thisroot.sh
         - mkdir build
         - (cd build && cmake3 ../ && make -j9)
         - (cd build && ./test_rutherford)
