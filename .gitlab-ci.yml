@@ -7,11 +7,12 @@ stages:
 cache:
  paths:
    - /builds/mkwon/RooParticle/build
- key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+ key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG-$CI_JOB_NAME"
 
 build:
     stage: build
     script:
+        - export
         - source /~/~/root6/root/bin/thisroot.sh
         - mkdir build
         - (cd build && cmake3 ../ && make -j9)
