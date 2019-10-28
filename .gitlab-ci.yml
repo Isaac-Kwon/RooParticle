@@ -5,12 +5,14 @@ stages:
   - test
 
 build:
+    stage: build
     script:
         - source ~/root6/root/bin/thisroot.sh
         - mkdir build
         - (cd build && cmake3 ../ && make -j9)
 
 test:
+    stage: test
     script:
         - source ~/root6/root/bin/thisroot.sh
         - mkdir build
