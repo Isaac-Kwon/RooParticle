@@ -29,12 +29,23 @@ qa_fixed:
     stage: qa
     script:
         - echo "Start QA Fixed Target"
+    environment:
+        name: FixedTarget
+        url: https://web.cern.ch/
+
 qa_collide:
     stage: qa
     script:
         - echo "Start QA Colliding"
+    environment:
+        name: Colliding
+        url: https://web.cern.ch/
+
 qa_3body:
     stage: qa
     script:
         - echo "Start QA 3body"
+    environment:
+        name: Colliding
+        url: https://web.cern.ch/
     
