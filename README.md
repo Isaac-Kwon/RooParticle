@@ -1,6 +1,8 @@
 # RooParticle
 Particle Collision Monte-Carlo Simulator with ROOT (CERN)
 
+[![pipeline status](https://gitlab.cern.ch/mkwon/RooParticle/badges/master/pipeline.svg)](https://gitlab.cern.ch/mkwon/RooParticle/commits/master)
+
 ## General Procedure for single event
 
 1. Define Event
@@ -12,3 +14,5 @@ Particle Collision Monte-Carlo Simulator with ROOT (CERN)
 
 Pre-defined force
 * Electric force (Coulomb Force) (CoulombForce::public Force)
+* 
+
