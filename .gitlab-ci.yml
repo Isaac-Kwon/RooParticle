@@ -13,7 +13,7 @@ cache:
 build:
     stage: build
     script:
-        - curl --request POST --header "PRIVATE-TOKEN:$CI_JOB_TOKEN" --form "note=Nice picture man!" https://gitlab.example.com/api/v4/projects/${CI_PROJECT_PATH//\//%2F} /repository/commits/$CI_BUILD_REF/comments
+        - curl --request POST --header "PRIVATE-TOKEN:$CI_JOB_TOKEN" --form "note=Nice picture man!" https://gitlab.example.com/api/v4/projects/${CI_PROJECT_PATH//\//%2F}/repository/commits/$CI_BUILD_REF/comments
         - source /~/~/root6/root/bin/thisroot.sh
         - mkdir build
         - (cd build && cmake3 ../ && make -j9)
