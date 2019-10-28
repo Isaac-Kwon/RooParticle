@@ -16,6 +16,7 @@ build:
         - echo "push comment to " https://gitlab.cern.ch/api/v4/projects/${CI_PROJECT_PATH//\//%2F}/repository/commits/$CI_BUILD_REF/comments
         - curl -v --request POST --header "PRIVATE-TOKEN:$GITLAB_API_KEY" --form "note=Nice picture man" https://gitlab.cern.ch/api/v4/projects/${CI_PROJECT_PATH//\//%2F}/repository/commits/$CI_BUILD_REF/comments
         #- sh .gitlab/test_comment.sh
+        - sleep 300
         - source /base/root/bin/thisroot.sh
         - mkdir build
         - (cd build && cmake3 ../ && make -j9)
