@@ -6,7 +6,7 @@ stages:
 
 cache:
  paths:
-   - ~/
+   - ~/RooParticle
 
 build:
     stage: build
@@ -18,6 +18,8 @@ build:
 test:
     stage: test
     script:
+        - ls
+        - source /~/~/root6/root/bin/thisroot.sh
         - (cd build && ./test_rutherford)
         - (cd build && ./test_collider_HeHe)
         - (cd build && ./test_3body_uniform)
