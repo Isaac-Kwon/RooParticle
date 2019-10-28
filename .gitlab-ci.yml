@@ -1,16 +1,25 @@
 image: gitlab-registry.cern.ch/mkwon/rooparticle:latest
 
-Build_Test:
+stages:
+  - build
+  - test
+
+cache:
+ paths:
+   - /builds/mkwon/RooParticle/build
+
+build:
+    stage: build
     script:
         - source /~/~/root6/root/bin/thisroot.sh
         - mkdir build
         - (cd build && cmake3 ../ && make -j9)
 
-Running_Test:
+test:
+    stage: test
     script:
+        - pwd && ls
         - source /~/~/root6/root/bin/thisroot.sh
-        - mkdir build
-        - (cd build && cmake3 ../ && make -j9)
         - (cd build && ./test_rutherford)
         - (cd build && ./test_collider_HeHe)
         - (cd build && ./test_3body_uniform)
