@@ -38,7 +38,9 @@ Float_t inspector::Evaluate(){
     return CalculateAngle(kFALSE);
   }else if(ftn=="RAD"){
     return CalculateAngle(kTRUE);
-  }else{
+  }else if(ftn=="CNT"){
+    return CountDeriving();
+  }{
     std::cout<<"No Function Name Defined / "<< ftn << std::endl;
     return kFALSE;
   }
@@ -47,6 +49,9 @@ Float_t inspector::Evaluate(){
 }
 
 Bool_t inspector::Inspect(){
+    if(ftn=="CNT"){
+      return Evaluate()>val;
+    }
     return Evaluate()<val;
 }
 
@@ -64,6 +69,20 @@ Float_t inspector::CalculateAngle(Bool_t rad){
     }else{
       return TMath::ACos(cc) * TMath::RadToDeg();
     }
+}
+
+Float_t inspector::CountDeriving(){
+  if(p1->IsInvincible()){
+    return p2->GetPath()->GetRecordSize();
+  }else if(p2->IsInvincible()){
+    return p1->GetPath()->GetRecordSize();
+  }
+
+  if(p2->GetPath()->GetRecordSize() != p1->GetPath()->GetRecordSize()){
+    std::cerr << "inspector::CountDeriving : particles' countings are not same." << std::endl;
+  }
+  return p1->GetPath()->GetRecordSize();
+
 }
 
 Bool_t inspector::SetInitial_D(Bool_t index, TString mtd,Double_t var){ //set primary condition from present condition

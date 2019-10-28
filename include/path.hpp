@@ -17,6 +17,8 @@ public:
   ~path();
   void AddRecord(TVector3 x_, TVector3 v_, Double_t time_);
 
+  Int_t    GetRecordSize(){return pos.size();}
+
   TVector3 GetRecordX(Int_t i);
   TVector3 GetRecordV(Int_t i);
   Double_t GetRecordT(Int_t i);
