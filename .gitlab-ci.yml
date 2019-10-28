@@ -5,7 +5,8 @@ stages:
   - test
 
 cache:
- - ~/
+ paths:
+   - ~/
 
 build:
     stage: build
