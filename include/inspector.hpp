@@ -36,10 +36,12 @@ class inspector{ //Calculator, Static
   // "COS" : Cosine value 
   // "DEG" : Angle (Degree)
   // "RAD" : Angle (Radian)
+  // "CNT" : DerivingCount
 
   protected:
   Float_t CalculateCosine();
   Float_t CalculateAngle(Bool_t rad=kFALSE);
+  Float_t CountDeriving();
 
   private:
   particle *p1, *p2;
