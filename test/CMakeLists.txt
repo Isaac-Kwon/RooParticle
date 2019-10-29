@@ -1,7 +1,11 @@
 
 set(TEST_EXE_ROOT
   test_rutherford
+  test_rutherford_inspect
+  test_rutherford_inspect_odd
   test_collider_HeHe
+  test_colliding_inspect
+  test_colliding_inspect_odd
   test_3body_uniform
   test_preEventTest
 )
