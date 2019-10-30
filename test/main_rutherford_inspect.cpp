@@ -13,6 +13,7 @@
 
 #include "iostream"
 #include <math.h>
+#include "unistd.h"
 
 #include "TROOT.h"
 #include "TTree.h"
@@ -60,7 +61,7 @@ Double_t angleXD(TVector3 v){
   return result;
 }
 
-int main(){
+int Experiment(Int_t nparticle, Int_t randomseed, TString outputFilename, Double_t derivingDegreeCriterion, Int_t derivingMinimumPoint, Double_t velocity, Double_t startingMinimumDistance, Int_t vperiod, Int_t autosavePeriod){
   event * eventT = new event();
 
   coulombForce * cp = new coulombForce();
@@ -83,20 +84,20 @@ int main(){
   TVector3 v2 = TVector3();
 
   Float_t imp_min = 0.;
-  Float_t imp_max = +1000.;
+  Float_t imp_max = +3000.;
   Float_t imp;
 
   EMparticle * p2;
 
-  Double_t v2_[] = {0.05,0.,0.};
+  Double_t v2_[] = {velocity,0.,0.};
   v2 = TVector3(v2_);
 
-  Double_t x2_[] = {-1000., 0., 0.,};
+  Double_t x2_[] = {-5000., 0., 0.,};
 
   Int_t i;
   Int_t j=0;
 
-  TString fname = TString::Format("Data/test_rutherford_inspect_even_%d.root",j);
+  TString fname = outputFilename;
 
   TFile * hfile = new TFile(fname,"RECREATE");
   TTree * tree = new TTree(TString::Format("TT_%d",j), "Rutherford Scattering Angle");
@@ -127,26 +128,39 @@ int main(){
   tree->Branch("SAngle", & SAngle_tree, "angle/D");
   tree->Branch("DCA", & DCA_tree, "DCA/D");
 
-  TRandom3 * r1 = new TRandom3();
+  TRandom3 * r1 = new TRandom3(randomseed);
 
-  for(i=0; i<100 ;i++ ){
+  Double_t ImpWall = startingMinimumDistance * TMath::Tan(derivingDegreeCriterion*TMath::DegToRad());
+
+  for(i=0; i<nparticle ;i++ ){
 
     imp = r1->Uniform(imp_min, imp_max);
 
     x2_[1] = imp;
+    if(imp>ImpWall){
+      x2_[0] = -1 * imp / TMath::Tan(derivingDegreeCriterion*TMath::DegToRad());
+    }else{
+      x2_[0] = -1 * startingMinimumDistance;
+    }
+
     x2 = TVector3(x2_);
     p2 = new EMparticle(4,2, x2, v2, false, true);
 
     FTE->makeEvent(p2);
 
-    FTE->getEvent()->AddInspector(new inspector(FTE->getEvent()->getParticle(0), p2, "DEG", 1));
-    FTE->getEvent()->AddInspector(new inspector(FTE->getEvent()->getParticle(0), p2, "CNT", 50000));
+    FTE->getEvent()->AddInspector(new inspector(FTE->getEvent()->getParticle(0), p2, "DEG", derivingDegreeCriterion));
+    FTE->getEvent()->AddInspector(new inspector(FTE->getEvent()->getParticle(0), p2, "CNT", derivingMinimumPoint));
     
     FTE->getEvent()->DeriveInspect(1,false);
     // FTE->getEvent()->DeriveDTN(1,10);
 
+
     imp_tree = imp;
+    sx_tree = x2_[0];
+    sy_tree = x2_[1];
     NPOINT_tree = p2->GetPath()->GetMaxNumber();
+    fx_tree  = p2->GetPath()->GetLastX().operator[](0);
+    fy_tree  = p2->GetPath()->GetLastX().operator[](1);
     vxF_tree = p2->GetPath()->GetLastV().operator[](0);
     vyF_tree = p2->GetPath()->GetLastV().operator[](1);
     SAngle_tree = angleXD(p2->GetPath()->GetLastV());
@@ -154,8 +168,13 @@ int main(){
 
     tree->Fill();
 
-    if(i%5==0){
-      std::cout<<j<<"/"<<i<<":"<<imp_tree<<":"<<vxF_tree<<":"<<SAngle_tree<<":"<<DCA_tree<<":"<<outtime_free<<endl;
+    if(i%autosavePeriod==0){
+      tree->AutoSave();
+    }
+
+    if(i%vperiod==0){
+      std::cout<<j<<"/"<<i<<" | IMP: "<<imp_tree<<" | xf_x: " << fx_tree << " | vf_x : "<<vxF_tree<<" | SAngle (DEG): "<<SAngle_tree * TMath::RadToDeg() <<" | POINT: "<<NPOINT_tree<<endl;
+      
     }
     FTE->offEvent();
     FTE->delEvent();
@@ -164,9 +183,129 @@ int main(){
 
   tree->Print();
   tree->AutoSave();
-  hfile->Write();
   hfile->Close();
   delete hfile;
 
   return 0;
+}
+
+//===============================================================================
+// ./test_rutherford_inspect
+// Rutherford Experiment Simulation (Numerical)
+// If there's less argv than parameters, it will use default value for absents
+// -n   Number of MonteCarlo Simulation
+// -r   Random Seed (UInt)
+// -o   Output Filename (path)
+// -d   Asymptote Degree Criterion
+// -D   Minimum Incident Distanc
+// -p   Minumum Number of Derived Points
+// -V   Incident Particle's Velocity (r.SOL)
+// -v   Verbose Period
+// -S   Autosave Period
+// -h   Help
+//===============================================================================
+
+int main(int argc, char *argv[]){
+  char c; // option
+
+  //Default setting
+  Int_t    nparticle               = 1000;
+  Int_t    randomseed              = 65539;
+  TString  outputFilename          = "Data/test_rutherford_inspect.root";
+  Double_t derivingDegreeCriterion = 1;
+  Int_t    derivingMinimumPoint    = 50000;
+  Double_t startingMinimumDistance = 5000;
+  Double_t velocity                = 0.05;
+  Int_t    vperiod                 = 5;
+  Int_t    autosavePeriod          = 100;
+  
+  //Modified Counter
+  Bool_t   f_nparticle               = kFALSE;
+  Bool_t   f_randomseed              = kFALSE;
+  Bool_t   f_outputFilename          = kFALSE;
+  Bool_t   f_startingMinimumDistance = kFALSE;
+  Bool_t   f_derivingDegreeCriterion = kFALSE;
+  Bool_t   f_derivingMinimumPoint    = kFALSE;
+  Bool_t   f_velocity                = kFALSE;
+  Bool_t   f_vperiod                 = kFALSE;
+  Bool_t   f_autosavePeriod          = kFALSE;
+
+  while( (c = getopt(argc, argv, "n:r:o:d:D:p:V:v:S:h")) != -1){
+  // -1 means getopt() parse all options
+  switch(c){
+    case 'n':
+      nparticle = std::stoi(optarg);
+      f_nparticle = kTRUE;
+      break;
+    case 'r':
+      randomseed = std::stoi(optarg);
+      f_randomseed = kTRUE;
+      break;
+    case 'o':
+      outputFilename = TString(optarg);
+      f_outputFilename = kTRUE;
+      break;
+    case 'd':
+      derivingDegreeCriterion = std::stod(optarg);
+      f_derivingDegreeCriterion = kTRUE;
+      break;
+    case 'D':
+      startingMinimumDistance = std::stod(optarg);
+      f_startingMinimumDistance = kTRUE;
+      break;
+    case 'p':
+      derivingMinimumPoint = std::stoi(optarg);
+      f_derivingMinimumPoint = kTRUE;
+      break;
+    case 'V':
+      velocity = std::stod(optarg);
+      f_velocity = kTRUE;
+      break;
+    case 'v':
+      vperiod = std::stod(optarg);
+      f_vperiod = kTRUE;
+      break;
+    case 'S':
+      autosavePeriod = std::stoi(optarg);
+      f_autosavePeriod = kTRUE;
+      break;
+    case 'h':
+      std::cout<<"Rutherford Experiment Simulation (Numerical)"<<std::endl;
+      std::cout<<"If there's less argv than parameters, it will use default value for absents"<<std::endl<<std::endl;
+      std::cout<<"-n \tNumber of MonteCarlo Simulation" <<std::endl;
+      std::cout<<"-r \tRandom Seed (UInt)" <<std::endl;
+      std::cout<<"-o \tOutput Filename (path)" <<std::endl;
+      std::cout<<"-d \tAsymptote Degree Criterion" <<std::endl;
+      std::cout<<"-D \tMinimum Incident Distanc" <<std::endl;
+      std::cout<<"-p \tMinumum Number of Derived Points" <<std::endl;
+      std::cout<<"-V \tIncident Particle's Velocity (r.SOL)" <<std::endl;
+      std::cout<<"-v \tVerbose Period" <<std::endl;
+      std::cout<<"-S \tAutosave Period" <<std::endl;
+      std::cout<<"-h \tHelp (this message)" <<std::endl;
+      return 0;
+    case '?':
+      printf("Unknown flag : %c", optopt);
+      break;
+    }
+  }
+
+  std::cout<<"===========================================" << std::endl;
+  std::cout<<"Rutherford Experiment Simulation" << std::endl;
+  std::cout<<"with following parameters" << std::endl << std::endl;
+
+  std::cout<<"Number of Particles (n) : "<<  nparticle <<" " << (!f_nparticle ? "(Default)" : " ") << std::endl;
+  std::cout<<"Random Seed (r) : "<< randomseed <<" " << (!f_randomseed ? "(Default)" : " ") << std::endl;
+
+  std::cout<<"Asymptote Degree Criterion (d) : " << derivingDegreeCriterion << " " << (!f_derivingDegreeCriterion ? "(Default)" : " ") << std::endl;
+  std::cout<<"Minumum Number of Derived Points (p) : " << derivingMinimumPoint << " " << (!f_derivingMinimumPoint ? "(Default)" : " ") << std::endl;
+  std::cout<<"Incident Particle's Velocity (r.SOL) (V) : " << velocity << " " << (!f_velocity ? "(Default)" : " ") << std::endl;
+  std::cout<<"Minimum Incident Distance (D) : " << startingMinimumDistance << " " << (!f_startingMinimumDistance ? "(Default)" : " ") << std::endl;
+
+  std::cout<<"Output File's Name (o) : "<< outputFilename << " " << (!f_nparticle ? "(Default)" : " ") << std::endl;
+  std::cout<<"Verbose Period (v) : " << vperiod << " " << (!f_vperiod ? "(Default)" : " ") << std::endl;
+  std::cout<<"Autosave Period (S) : " << autosavePeriod << " " << (!f_autosavePeriod ? "(Default)" : " ") << std::endl;
+  std::cout<<"===========================================" << std::endl << std::endl;
+
+  return Experiment(nparticle, randomseed, outputFilename, derivingDegreeCriterion, derivingMinimumPoint, velocity, startingMinimumDistance, vperiod, autosavePeriod);
+
 }
