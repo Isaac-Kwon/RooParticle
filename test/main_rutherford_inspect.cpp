@@ -105,6 +105,10 @@ int main(){
 
   Double_t   imp_tree;
   Int_t      NPOINT_tree;
+  Double_t   fx_tree;
+  Double_t   fy_tree;
+  Double_t   sx_tree;
+  Double_t   sy_tree;
   Double_t   vxF_tree;
   Double_t   vyF_tree;
   Double_t   SAngle_tree;
@@ -114,6 +118,10 @@ int main(){
 
   tree->Branch("imp", &imp_tree, "imp/D");
   tree->Branch("NPOINT", &NPOINT_tree, "Npoint/I");
+  tree->Branch("fx", & fx_tree, "fx/D");
+  tree->Branch("fy", & fy_tree, "fy/D");
+  tree->Branch("sx", & sx_tree, "sx/D");
+  tree->Branch("sy", & sy_tree, "sy/D");
   tree->Branch("vxF", & vxF_tree, "vxF/D");
   tree->Branch("vyF", & vyF_tree, "vyF/D");
   tree->Branch("SAngle", & SAngle_tree, "angle/D");
