@@ -1,7 +1,7 @@
 echo "Rutherford Scattering Simulation"
 
 $CI_PROJECT_DIR/build/test_rutherford_inspect \
--n 50 \
+-n 1 \
 -o /data/test_rutherford_inspect.root \
 -d 1 \
 -v 10 \

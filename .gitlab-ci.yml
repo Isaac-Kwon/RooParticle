@@ -21,5 +21,6 @@ build:
 test:
     stage: test
     script:
+        - export
         - source /base/root/bin/thisroot.sh
         - sh .gitlab/ci_test.sh
