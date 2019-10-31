@@ -15,6 +15,7 @@ build:
     stage: build
     script:
         - echo $SOMETHING
+        - export
         - source /base/root/bin/thisroot.sh
         - mkdir build
         - (cd build && cmake3 ../ && make -j9)
