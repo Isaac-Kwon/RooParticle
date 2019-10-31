@@ -2,8 +2,8 @@ $CI_PROJECT_DIR/build/test_rutherford_inspect \
 -n 1000 \
 -o /data/test_rutherford_inspect.root \
 -d 1 \
--v 100 \
--S 100
+-v 10 \
+-S 10
 
 python3 $CI_PROJECT_DIR/.gitlab/upload_qa \
 https://gitlab.cern.ch \
