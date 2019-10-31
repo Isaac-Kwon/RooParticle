@@ -197,7 +197,7 @@ int Experiment(Int_t nparticle, Int_t randomseed, TString outputFilename, Double
 // -r   Random Seed (UInt)
 // -o   Output Filename (path)
 // -d   Asymptote Degree Criterion
-// -D   Minimum Incident Distanc
+// -D   Minimum Incident Distance
 // -p   Minumum Number of Derived Points
 // -V   Incident Particle's Velocity (r.SOL)
 // -v   Verbose Period
