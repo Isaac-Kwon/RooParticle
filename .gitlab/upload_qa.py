@@ -6,7 +6,14 @@ from gitlab import gitlab
 from sys import argv
 import json
 
-print(argv)
+# print(argv)
+print("""
+Upload file
+Gitlab URL : %s
+Repository Name : %s
+Upload File : %s
+Commit SHA : %s
+"""%(argv[1], argv[2], argv[4], argv[5]))
 
 g = gitlab(argv[1], argv[2], argv[3])
 adr = g.uploadFile(argv[4],True)
