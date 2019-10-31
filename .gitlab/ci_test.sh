@@ -1,7 +1,7 @@
 $CI_PROJECT_DIR/build/test_rutherford_inspect \
 -n 1000 \
 -o /data/test_rutherford_inspect.root \
--d 0.1 \
+-d 1 \
 -v 100 \
 -S 100
 
