@@ -9,7 +9,7 @@ $CI_PROJECT_DIR/build/test_rutherford_inspect \
 
 echo "Upload to Gitlab Repository Board"
 
-python3 $CI_PROJECT_DIR/.gitlab/upload_qa \
+python3 $CI_PROJECT_DIR/.gitlab/upload_qa.py \
 https://gitlab.cern.ch \
 mkwon/RooParticle \
 $GITLAB_API_KEY \
