@@ -23,7 +23,7 @@ Produced MC File (ROOT): %s
 
 """%(commit_sha, adr["markdown"])
 
-g.postIssue("Test QA %s"%(commit_sha), description=content, labels="Test QA, QA")
+g.postIssue("Test QA %s"%(commit_sha[0:8]), description=content, labels="Test QA, QA")
 
 
 

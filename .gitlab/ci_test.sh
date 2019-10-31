@@ -10,4 +10,4 @@ https://gitlab.cern.ch \
 mkwon/RooParticle \
 $GITLAB_API_KEY \
 /data/test_rutherford_inspect.root
-$CI_BUILD_REF
+$CI_COMMIT_SHA
