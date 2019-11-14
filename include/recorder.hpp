@@ -9,6 +9,7 @@ template<typename Element>
 class recorder{
     public:
     recorder(){return;}
+    recorder(Element   data_){data=data_;}
     recorder(Element * addr_){addr=addr_;}
     ~recorder(){}
     void    SetAddress(Element * addr_){ addr = addr_; }
