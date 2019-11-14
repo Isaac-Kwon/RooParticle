@@ -14,6 +14,7 @@
 #include "force.hpp"
 #include "eventVolume.hpp"
 #include "inspector.hpp"
+#include "recorder.hpp"
 
 using namespace std;
 
@@ -40,26 +41,21 @@ public:
   //GetMethod
   particle * getParticle(Int_t index);
   force * getForce(Int_t index);
+  inspector * getInspector(Int_t index);
   Int_t getNParticle(){return nparticle;}
   Int_t getNForce(){return nforce;}
+  Int_t getNInspector(){return inspectors.size();}
 
   //Inspection Deriving and Pre-Deriving.
   void preDerive();
   void preDeriveSetup();
   Bool_t resetPreDerive();
   Bool_t Inspect();
-
   TString Print(Bool_t onlymechanic=kFALSE, Bool_t mute=kFALSE, Bool_t pprint=kFALSE);
-
   Bool_t SetInitial();
 
-  // void SetDeriver(deriver * deriver_, Bool_t delete_deriver=kTRUE);
-
-  // friend deriver;
-
 protected:
-  inspector* getInspector(Int_t index){return inspectors[index];}
-  Int_t getNInspector(){return inspectors.size();}
+  
   std::vector<particle*> particles;
   std::vector<force*> forces;
 
@@ -70,7 +66,6 @@ private:
   eventVolume * volume;
   event * pEvent;
   Bool_t preDerived = kFALSE;
-  // Bool_t preTuning();
   
   std::vector<inspector*> inspectors;
 };
