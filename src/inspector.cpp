@@ -71,17 +71,8 @@ Float_t inspector::CalculateAngle(Bool_t rad){
     }
 }
 
-Float_t inspector::CountDeriving(){
-  if(p1->IsInvincible()){
-    return p2->GetPath()->GetRecordSize();
-  }else if(p2->IsInvincible()){
-    return p1->GetPath()->GetRecordSize();
-  }
-
-  if(p2->GetPath()->GetRecordSize() != p1->GetPath()->GetRecordSize()){
-    std::cerr << "inspector::CountDeriving : particles' countings are not same." << std::endl;
-  }
-  return p1->GetPath()->GetRecordSize();
+Long_t inspector::CountDeriving(){
+  return min(p1->GetECNT(), p2->GetECNT());
 
 }
 
@@ -162,6 +153,9 @@ TString inspector::Print(Bool_t particles, Bool_t mechanics, Bool_t mute, Bool_t
 
   result += ", VAL: ";
   result += Evaluate();
+
+  result += ", RST: ";
+  result += Inspect();
 
   result += " ]";
   

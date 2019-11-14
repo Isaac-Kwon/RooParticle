@@ -74,6 +74,7 @@ void particle::resetHold(){
 }
 
 void particle::applyForce(const TVector3 f, const Double_t dt){
+  ecount+=1;
   if(Invincible==true){
     if(Record==true){
       ppath->AddRecord(x,v, etime);

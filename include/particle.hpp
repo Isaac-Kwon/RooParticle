@@ -43,6 +43,7 @@ public:
   TVector3 GetX(){return TVector3(x);}
   TVector3 GetV(){return TVector3(v);}
   TVector3 GetP(){return TVector3(v * GetM());}
+  Long_t   GetECNT(){return ecount;} //Eveoled number of point
   Double_t GetM0(){return m0;}
   Double_t GetM(Bool_t restmass=false);
   Double_t GetTime(){return etime;}
@@ -69,6 +70,7 @@ private:
   TVector3 hF         = TVector3();
 
   Double_t etime      = 0.;
+  Long_t   ecount      = 0;
 
   Bool_t   Record     = false;
   path*    ppath;

@@ -141,27 +141,38 @@ int Experiment(Int_t nparticle, Int_t randomseed,
     }
 
     x2 = TVector3(x2_);
-    p2 = new EMparticle(4,2, x2, v2, false, true);
+    p2 = new EMparticle(4,2, x2, v2, false, false);
 
     FTE->makeEvent(p2);
 
     FTE->getEvent()->AddInspector(new inspector(FTE->getEvent()->getParticle(0), p2, "DEG", derivingDegreeCriterion));
     FTE->getEvent()->AddInspector(new inspector(FTE->getEvent()->getParticle(0), p2, "CNT", derivingMinimumPoint));
     
-    FTE->getEvent()->DeriveInspect(1,false);
-    // FTE->getEvent()->DeriveDTN(1,10);
+    recorderD * DCARecorder = new recorderD(numeric_limits<Double_t>::max());
+    
+    Int_t deriveN;
+    Double_t distance=numeric_limits<Double_t>::max();
 
+    // std::cout<<FTE->getEvent()<<std::endl;
+
+    for(deriveN=0; !(FTE->getEvent()->Inspect()); deriveN++){
+      FTE->getEvent()->DeriveDTN();
+      distance = ((FTE->getEvent()->getParticle(0)->GetX())-(p2->GetX())).Mag();
+      // if(deriveN%1000==0) FTE->getEvent()->Print(kFALSE, kFALSE, kTRUE);
+      DCARecorder->MinSave(distance);
+    }
+    
 
     imp_tree = imp;
     sx_tree = x2_[0];
     sy_tree = x2_[1];
-    // NPOINT_tree = p2->GetPath()->GetMaxNumber();
-    // fx_tree  = p2->GetPath()->GetLastX().operator[](0);
-    // fy_tree  = p2->GetPath()->GetLastX().operator[](1);
-    // vxF_tree = p2->GetPath()->GetLastV().operator[](0);
-    // vyF_tree = p2->GetPath()->GetLastV().operator[](1);
-    // SAngle_tree = angleXD(p2->GetPath()->GetLastV());
-    // p2->GetPath()->GetDCA(x1, DCA_tree, outtime_free);
+    NPOINT_tree = deriveN;
+    fx_tree = p2->GetX().operator[](0);
+    fy_tree = p2->GetX().operator[](1);
+    vxF_tree = p2->GetV().operator[](0);
+    vyF_tree = p2->GetV().operator[](1);
+    SAngle_tree = angleXD(p2->GetV());
+    DCA_tree = DCARecorder->GetData();
 
     tree->Fill();
 
@@ -187,7 +198,7 @@ int Experiment(Int_t nparticle, Int_t randomseed,
 }
 
 //===============================================================================
-// ./test_rutherford_inspect
+// ./test_rutherford_recorder
 // Rutherford Experiment Simulation (Numerical)
 // If there's less argv than parameters, it will use default value for absents
 // -n   Number of MonteCarlo Simulation
@@ -208,7 +219,7 @@ int main(int argc, char *argv[]){
   //Default setting
   Int_t    nparticle               = 1000;
   Int_t    randomseed              = 65539;
-  TString  outputFilename          = "Data/test_rutherford_inspect.root";
+  TString  outputFilename          = "Data/test_rutherford_recorder.root";
   Double_t derivingDegreeCriterion = 1;
   Int_t    derivingMinimumPoint    = 50000;
   Double_t startingMinimumDistance = 5000;

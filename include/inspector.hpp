@@ -41,7 +41,7 @@ class inspector{ //Calculator, Static
   protected:
   Float_t CalculateCosine();
   Float_t CalculateAngle(Bool_t rad=kFALSE);
-  Float_t CountDeriving();
+  Long_t CountDeriving();
 
   private:
   particle *p1, *p2;
