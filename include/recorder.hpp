@@ -33,3 +33,4 @@ typedef recorder<Int_t>    recorderI;
 typedef recorder<Long_t>   recorderL;
 typedef recorder<Float_t>  recorderF;
 typedef recorder<Double_t> recorderD;
+#endif
