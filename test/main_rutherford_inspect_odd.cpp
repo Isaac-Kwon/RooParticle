@@ -130,10 +130,10 @@ int main(){
 
     FTE->makeEvent(p2);
 
-    FTE->getEvent()->AddInspector(new inspector(FTE->getEvent()->getParticle(0), p2, "DEG", 1));
-    FTE->getEvent()->AddInspector(new inspector(FTE->getEvent()->getParticle(0), p2, "CNT", 50000));
+    FTE->getEvent()->AddInspector(new inspectorP(FTE->getEvent()->getParticle(0), p2, "DEG", 1));
+    FTE->getEvent()->AddInspector(new inspectorP(FTE->getEvent()->getParticle(0), p2, "CNT", 50000));
     
-    FTE->getEvent()->DeriveInspect(1,false);
+    FTE->getEvent()->DeriveInspect(1);
     // FTE->getEvent()->DeriveDTN(1,10);
 
     imp_tree = imp;

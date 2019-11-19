@@ -119,10 +119,10 @@ int main(){
 
     exp->makeEvent(p1, p2);
 
-    exp->getEvent()->AddInspector(new inspector(p1, p2, "DEG", 1));
-    exp->getEvent()->AddInspector(new inspector(p1, p2, "CNT", 50000));
+    exp->getEvent()->AddInspector(new inspectorP(p1, p2, "DEG", 1));
+    exp->getEvent()->AddInspector(new inspectorP(p1, p2, "CNT", 50000));
     
-    exp->getEvent()->DeriveInspect(1,false);
+    exp->getEvent()->DeriveInspect(1);
     // FTE->getEvent()->DeriveDTN(1,10);
 
     imp_tree = imp;

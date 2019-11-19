@@ -54,7 +54,7 @@ public:
 
   TString  Print(Bool_t onlymechanic=kFALSE, Bool_t mute=kFALSE);
 
-  friend class inspector;
+  friend class inspectorP;
 
 protected:
   Double_t q          = 0;
