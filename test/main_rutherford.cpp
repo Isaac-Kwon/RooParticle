@@ -17,6 +17,7 @@
 #include "TROOT.h"
 #include "TTree.h"
 #include "TFile.h"
+
 class FixedTargetExperiment{
 public:
   void setTemplate(event* eventT_){eventT=eventT_;}
@@ -146,12 +147,5 @@ int main(){
     hfile->Close();
     delete hfile;
   }
-
-
-
-
-
-
   return 0;
-
 }

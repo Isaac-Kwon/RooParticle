@@ -10,7 +10,6 @@
 #include "event.hpp"
 #include "particle.hpp"
 #include "force.hpp"
-#include "recorder.hpp"
 
 #include "iostream"
 #include <math.h>
@@ -41,9 +40,6 @@ void FixedTargetExperiment::makeEvent(particle* p){
   currentEvent->AddParticle(p);
 }
 
-
-
-
 TVector3 unitv(TVector3 v){
   TVector3 result = TVector3();
   result = v*(1/(v.Mag()));
@@ -57,10 +53,10 @@ Double_t angleXD(TVector3 v){
   return result;
 }
 
-int Experiment(Int_t nparticle, Int_t randomseed,
+int Experiment(Float_t ImpactParameter, Double_t velocity, Float_t dt,
                TString outputFilename,
-               Double_t derivingDegreeCriterion, Int_t derivingMinimumPoint,
-               Double_t velocity, Double_t startingMinimumDistance,
+               Double_t derivingDegreeCriterion, 
+               Int_t derivingMinimumPoint, Double_t startingMinimumDistance,
                Int_t vperiod, Int_t autosavePeriod){
   event * eventT = new event();
 
@@ -83,8 +79,6 @@ int Experiment(Int_t nparticle, Int_t randomseed,
   TVector3 x2 = TVector3();
   TVector3 v2 = TVector3();
 
-  Float_t imp_min = 0.;
-  Float_t imp_max = +3000.;
   Float_t imp;
 
   EMparticle * p2;
@@ -148,23 +142,23 @@ int Experiment(Int_t nparticle, Int_t randomseed,
 
     FTE->makeEvent(p2);
 
-    FTE->getEvent()->AddInspector(new inspectorP(FTE->getEvent()->getParticle(0), p2, "DEG", derivingDegreeCriterion));
-    FTE->getEvent()->AddInspector(new inspectorP(FTE->getEvent()->getParticle(0), p2, "CNT", derivingMinimumPoint));
+    FTE->getEvent()->AddInspector(new inspector(FTE->getEvent()->getParticle(0), p2, "DEG", derivingDegreeCriterion));
+    FTE->getEvent()->AddInspector(new inspector(FTE->getEvent()->getParticle(0), p2, "CNT", derivingMinimumPoint));
     
-    FTE->getEvent()->DeriveInspect(1);
+    FTE->getEvent()->DeriveInspect(1,false);
     // FTE->getEvent()->DeriveDTN(1,10);
 
 
     imp_tree = imp;
     sx_tree = x2_[0];
     sy_tree = x2_[1];
-    // NPOINT_tree = p2->GetPath()->GetMaxNumber();
-    // fx_tree  = p2->GetPath()->GetLastX().operator[](0);
-    // fy_tree  = p2->GetPath()->GetLastX().operator[](1);
-    // vxF_tree = p2->GetPath()->GetLastV().operator[](0);
-    // vyF_tree = p2->GetPath()->GetLastV().operator[](1);
-    // SAngle_tree = angleXD(p2->GetPath()->GetLastV());
-    // p2->GetPath()->GetDCA(x1, DCA_tree, outtime_free);
+    NPOINT_tree = p2->GetPath()->GetMaxNumber();
+    fx_tree  = p2->GetPath()->GetLastX().operator[](0);
+    fy_tree  = p2->GetPath()->GetLastX().operator[](1);
+    vxF_tree = p2->GetPath()->GetLastV().operator[](0);
+    vyF_tree = p2->GetPath()->GetLastV().operator[](1);
+    SAngle_tree = angleXD(p2->GetPath()->GetLastV());
+    p2->GetPath()->GetDCA(x1, DCA_tree, outtime_free);
 
     tree->Fill();
 
