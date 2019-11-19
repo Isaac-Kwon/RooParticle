@@ -34,24 +34,30 @@ event::event(event &e){
   }
 
   //copy inspectors : link all particles in each inspectors
-  vector<inspector*>::iterator ii_;
-  inspector* iis; //source inspector
+  vector<inspectorT*>::iterator ii_;
+
   Int_t ip1=0, ip2=0;
   for(ii_=e.inspectors.begin(); ii_!=e.inspectors.end(); ii_++){
-    iis = *ii_;
-    Int_t i;
-    for(i=0; i<e.particles.size();i++){
-      if((iis->GetParticle1())==e.particles[i]){
-        ip1 = i;
+    if((*ii_)->IsInspectorP()){
+      inspectorP* iis; //source inspector
+      iis = (inspectorP*) *ii_;
+      Int_t i;
+      for(i=0; i<e.particles.size();i++){
+        if((iis->GetParticle1())==e.particles[i]){
+          ip1 = i;
+        }
+        if((iis->GetParticle2())==e.particles[i]){
+          ip2 = i;
+        }
       }
-      if((iis->GetParticle2())==e.particles[i]){
-        ip2 = i;
-      }
+      AddInspector(new inspectorP( // Make new inspector (linking particles)
+        getParticle(ip1), getParticle(ip2),
+        iis->GetMethod(), iis->GetCriterion())
+        );
+    }else if((*ii_)->IsInspectorE()){
+      inspectorE* iie = (inspectorE*) *ii_;
+      AddInspector(new inspectorE(iie->GetEvent(), iie->GetMethod(), iie->GetCriterion()));
     }
-    AddInspector(new inspector( // Make new inspector (linking particles)
-      getParticle(ip1), getParticle(ip2),
-      iis->GetMethod(), iis->GetCriterion())
-    );
   }
 
   //copy other properties
@@ -102,6 +108,16 @@ void event::DeriveDT(Double_t dt){
     (*pp_)->releaseForce(dt);
   }
   return;
+
+  // Int_t i;
+  // for(i=0; i<recorders.size(); i++){
+  //   if(recorders[i]->IsConditioned()){
+  //     recorders[i]->Save();
+  //   }else{
+  //     recorders[i]->JudgeSave();
+  //   }
+  // }
+  // return;
 }
 
 void event::DeriveDTN(Int_t n, Double_t dt){
@@ -159,9 +175,9 @@ force * event::getForce(Int_t index){
   return f1;
 }
 
-inspector * event::getInspector(Int_t index){
-  vector<inspector*>::iterator p1_;
-  inspector* p1;
+inspectorT * event::getInspector(Int_t index){
+  vector<inspectorT*>::iterator p1_;
+  inspectorT* p1;
 
   Int_t i=0;
   if(index >= getNInspector()){
@@ -179,6 +195,50 @@ inspector * event::getInspector(Int_t index){
   return p1;
 }
 
+Double_t event::GetNetKE(){
+
+  vector<particle*>::iterator p_;
+  particle *p;
+
+  Double_t tempKE = 0.;
+  for(p_=particles.begin(); p_!=particles.end(); p_++){
+    p = *p_;
+    if(p->IsInvincible()) continue;
+    tempKE += (0.5)*(p->GetM())*(p->GetX().Mag2());
+  }
+  
+  return tempKE;
+}
+
+Double_t event::GetNetPE(){
+
+  vector<particle*>::iterator p1_;
+  vector<particle*>::iterator p2_;
+  vector<force*>::iterator    ff_;
+
+  particle *p1, *p2;
+  force *ff;
+
+  Double_t tempPE = 0.;
+  for(p1_=particles.begin(); p1_!=particles.end(); p1_++){
+    p1 = *p1_;
+    for(p2_=particles.begin(); p2_!=particles.end(); p2_++){
+      p2 = *p2_;
+      if(p1==p2){
+        continue;
+      }
+      for(ff_=forces.begin(); ff_!=forces.end(); ff_++){
+        ff = *ff_;
+        
+        tempPE += ff->Potential(p1, p2);
+      }
+    }
+  }
+  
+  return tempPE;
+}
+
+
 void event::preDerive(){
   if(preDerived){
     delete pEvent;
@@ -186,7 +246,7 @@ void event::preDerive(){
   }
   pEvent = new event(*this);
   preDerived = kTRUE;
-  pEvent->DeriveInspect(1, kFALSE);
+  pEvent->DeriveInspect(1);
   // cout<<"NEW EVENT COMP"<<endl;
   return;
 }
@@ -201,41 +261,17 @@ Bool_t event::resetPreDerive(){
   }
 }
 
-void event::DeriveInspect(Int_t iperiod, Bool_t verbose, Int_t vperiod){
+void event::DeriveInspect(Int_t iperiod){
   Int_t i;
   for(i=0; i%iperiod==0 ? !Inspect() : kTRUE ;i++){
     DeriveDT();
-    if(verbose && ((i%vperiod)==0)){
-      Int_t j;
-      cout<<i<<endl;
-      for(j=0; j<inspectors.size() ;j++){
-        cout<<"inspector "<<j<<endl;
-        inspectors[j]->GetParticle1()->GetX().Print();
-        inspectors[j]->GetParticle1()->GetV().Print();
-        inspectors[j]->GetParticle2()->GetX().Print();
-        inspectors[j]->GetParticle2()->GetV().Print();
-        cout<<inspectors[j]->GetParticle1()->GetTime()<<endl;
-        
-        cout<<inspectors[j]->Evaluate()<<endl;
-        cout<<inspectors[j]->Inspect()<<endl;
-      }
-    }
-  }
-  if(verbose){
-      Int_t j;
-      cout<<i<<endl;
-      for(j=0; j<inspectors.size() ;j++){
-        cout<<"inspector "<<j<<endl;
-        cout<<inspectors[j]->Evaluate()<<endl;
-        cout<<inspectors[j]->Inspect()<<endl;
-      }
   }
   return;
 }
 
 Bool_t event::Inspect(){
-  vector<inspector*>::iterator i_;
-  inspector* i;
+  vector<inspectorT*>::iterator i_;
+  inspectorT* i;
   Bool_t result=kTRUE;
 
   for(i_=inspectors.begin(); i_!=inspectors.end(); i_++){
@@ -255,12 +291,10 @@ void event::preDeriveSetup(){
 
 TString event::Print(Bool_t onlymechanic, Bool_t mute, Bool_t pprint){
   TString result = TString("[ Event ");
-
+  
   if(pprint){
     result = result + "\n";
   }
-
-  // cout<<result<<endl;
 
   if(particles.size()>0){
     result += TString("| Particles ");
@@ -274,7 +308,6 @@ TString event::Print(Bool_t onlymechanic, Bool_t mute, Bool_t pprint){
       result = result + "\n";
     }
   }
-  // cout<<result<<endl<<endl;
 
   if(inspectors.size()>0){
     result += TString("| Inspectors ");
@@ -282,13 +315,12 @@ TString event::Print(Bool_t onlymechanic, Bool_t mute, Bool_t pprint){
     if(pprint){
       result += "\n";
     }
-    std::vector<inspector*>::iterator i;
+    std::vector<inspectorT*>::iterator i;
     for(i=inspectors.begin(); i<inspectors.end(); i++){
       result += (*i)->Print(kTRUE, kTRUE, kTRUE, pprint);
     }
     result += TString(" }");
   }
-  // cout<<result<<endl<<endl;
 
   result += TString(" ]");
 
@@ -299,18 +331,18 @@ TString event::Print(Bool_t onlymechanic, Bool_t mute, Bool_t pprint){
   return result;
 }
 
-Bool_t event::SetInitial(){
-  inspectors[0]->SetInitial();
+// Bool_t event::SetInitial(){
+//   inspectors[0]->SetInitial();
 
-  if(inspectors.size()>1){
-    return kFALSE;
-  }
+//   if(inspectors.size()>1){
+//     return kFALSE;
+//   }
 
-  return kTRUE;
+//   return kTRUE;
 
-  std::vector<inspector*>::iterator i;
-  for(i=inspectors.begin(); i<inspectors.end(); ++i){
-    (*i)->SetInitial();
-  }
-  return kTRUE;
-}
+//   std::vector<inspectorT*>::iterator i;
+//   for(i=inspectors.begin(); i<inspectors.end(); ++i){
+//     (*i)->SetInitial();
+//   }
+//   return kTRUE;
+// }
