@@ -159,6 +159,26 @@ force * event::getForce(Int_t index){
   return f1;
 }
 
+inspector * event::getInspector(Int_t index){
+  vector<inspector*>::iterator p1_;
+  inspector* p1;
+
+  Int_t i=0;
+  if(index >= getNInspector()){
+    std::cerr<<"CALL INSPECTOR ERROR:: Index over NInspector"<<endl;
+    return 0;
+  }
+  for(p1_=inspectors.begin(); p1_!=inspectors.end(); p1_++){
+    // p1 = &p1_;
+    p1 = *p1_;
+    if(i==index){
+      return p1;
+    }
+    i++;
+  }
+  return p1;
+}
+
 void event::preDerive(){
   if(preDerived){
     delete pEvent;

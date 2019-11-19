@@ -8,33 +8,18 @@ stages:
 cache:
  paths:
    - /builds/mkwon/RooParticle/build
+   - /data
  key: "$CI_BUILD_REF"
 
 build:
     stage: build
     script:
-        - source /~/~/root6/root/bin/thisroot.sh
+        - source /base/root/bin/thisroot.sh
         - mkdir build
         - (cd build && cmake3 ../ && make -j9)
 
 test:
     stage: test
     script:
-        - source /~/~/root6/root/bin/thisroot.sh
-        - (cd build && ./test_rutherford)
-        - (cd build && ./test_collider_HeHe)
-        - (cd build && ./test_3body_uniform)
-
-qa_fixed:
-    stage: qa
-    script:
-        - echo "Start QA Fixed Target"
-qa_collide:
-    stage: qa
-    script:
-        - echo "Start QA Colliding"
-qa_3body:
-    stage: qa
-    script:
-        - echo "Start QA 3body"
-    
+        - source /base/root/bin/thisroot.sh
+        - sh .gitlab/ci_test.sh
