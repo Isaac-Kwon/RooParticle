@@ -32,7 +32,7 @@ public:
   void applyMechanic(const TVector3 x_, const TVector3 v_){x = x_; v = v_;}
   void applyX(const TVector3 x_){x=x_;}
   void applyV(const TVector3 v_){v=v_;}
-  void applyForce(const TVector3 f, const Double_t dt=1.);
+  void applyForce(const TVector3 f, const Double_t dt=1., Bool_t SR=kFALSE);
   void applyDX(const TVector3 dx){x += dx;}
   void applyDV(const TVector3 dv){v += dv;}
   void applyDelta(const TVector3 dx, const TVector3 dv){x += dx; v += dv;}
@@ -45,7 +45,9 @@ public:
   TVector3 GetP(){return TVector3(v * GetM());}
   Long_t   GetECNT(){return ecount;} //Eveoled number of point
   Double_t GetM0(){return m0;}
-  Double_t GetM(Bool_t restmass=false);
+  Double_t GetM(const Bool_t restmass=kTRUE);
+  Double_t GetKE(const Bool_t SR=kFALSE){return 0.5*GetM(!SR)*(v.Mag2());}
+
   Double_t GetTime(){return etime;}
   path*    GetPath(){return ppath;}
 

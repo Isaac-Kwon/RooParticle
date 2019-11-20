@@ -73,7 +73,7 @@ void particle::resetHold(){
   hF = TVector3();
 }
 
-void particle::applyForce(const TVector3 f, const Double_t dt){
+void particle::applyForce(const TVector3 f, const Double_t dt, const Bool_t SR){
   ecount+=1;
   if(Invincible==true){
     if(Record==true){
@@ -81,7 +81,7 @@ void particle::applyForce(const TVector3 f, const Double_t dt){
     }
     return;
   }
-  Double_t m_ = GetM(false);
+  Double_t m_ = GetM(!SR);
   TVector3 a = f * (1/m_);
   applyDX(
     a * (0.5) * pow(dt,2) + v * dt

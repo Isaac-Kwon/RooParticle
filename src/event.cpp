@@ -195,7 +195,7 @@ inspector * event::getInspector(Int_t index){
   return p1;
 }
 
-Double_t event::GetNetKE(){
+Double_t event::GetNetKE(const Bool_t SR){
 
   vector<particle*>::iterator p_;
   particle *p;
@@ -204,37 +204,71 @@ Double_t event::GetNetKE(){
   for(p_=particles.begin(); p_!=particles.end(); p_++){
     p = *p_;
     if(p->IsInvincible()) continue;
-    tempKE += (0.5)*(p->GetM())*(p->GetX().Mag2());
+    tempKE += (0.5)*(p->GetM(!SR))*(p->GetV().Mag2());
   }
-  
   return tempKE;
+}
+
+Double_t event::GetPE(Int_t index){
+  return GetPE(getParticle(index));
+}
+
+Double_t event::GetPE(particle* p){
+  vector<particle*>::iterator pt_;
+  vector<force*>::iterator    ff_;
+
+  particle *pt;
+  force *ff;
+
+  Double_t tempPE = 0.;
+
+  if(p->IsInvincible()) return 0;
+
+  for(pt_=particles.begin(); pt_!=particles.end(); pt_++){
+    pt = *pt_;
+    if(pt==p){
+      continue;
+    }
+    for(ff_=forces.begin(); ff_!=forces.end(); ff_++){
+      ff = *ff_;
+      
+      tempPE += ff->Potential(p, pt);
+    }
+  }
+  return tempPE;
 }
 
 Double_t event::GetNetPE(){
 
-  vector<particle*>::iterator p1_;
-  vector<particle*>::iterator p2_;
-  vector<force*>::iterator    ff_;
+  // vector<particle*>::iterator p1_;
+  // vector<particle*>::iterator p2_;
+  // vector<force*>::iterator    ff_;
 
-  particle *p1, *p2;
-  force *ff;
+  // particle *p1, *p2;
+  // force *ff;
 
-  Double_t tempPE = 0.;
-  for(p1_=particles.begin(); p1_!=particles.end(); p1_++){
-    p1 = *p1_;
-    for(p2_=particles.begin(); p2_!=particles.end(); p2_++){
-      p2 = *p2_;
-      if(p1==p2){
-        continue;
-      }
-      for(ff_=forces.begin(); ff_!=forces.end(); ff_++){
-        ff = *ff_;
+  // Double_t tempPE = 0.;
+  // for(p1_=particles.begin(); p1_!=particles.end(); p1_++){
+  //   p1 = *p1_;
+  //   for(p2_=particles.begin(); p2_!=particles.end(); p2_++){
+  //     p2 = *p2_;
+  //     if(p1==p2){
+  //       continue;
+  //     }
+  //     for(ff_=forces.begin(); ff_!=forces.end(); ff_++){
+  //       ff = *ff_;
         
-        tempPE += ff->Potential(p1, p2);
-      }
-    }
+  //       tempPE += ff->Potential(p1, p2);
+  //     }
+  //   }
+  // }
+  // return tempPE;
+
+  Int_t i;
+  Double_t tempPE = 0.;
+  for(i=0; i<getNParticle(); i++){
+    tempPE += GetPE(i);
   }
-  
   return tempPE;
 }
 
@@ -330,19 +364,3 @@ TString event::Print(Bool_t onlymechanic, Bool_t mute, Bool_t pprint){
 
   return result;
 }
-
-// Bool_t event::SetInitial(){
-//   inspectors[0]->SetInitial();
-
-//   if(inspectors.size()>1){
-//     return kFALSE;
-//   }
-
-//   return kTRUE;
-
-//   std::vector<inspector*>::iterator i;
-//   for(i=inspectors.begin(); i<inspectors.end(); ++i){
-//     (*i)->SetInitial();
-//   }
-//   return kTRUE;
-// }

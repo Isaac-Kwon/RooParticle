@@ -46,9 +46,11 @@ public:
   Int_t getNInspector(){return inspectors.size();}
 
   //Calculation
-  Double_t GetNetKE();
+  Double_t GetPE(Int_t index);
+  Double_t GetPE(particle* p);
+  Double_t GetNetKE(const Bool_t SR=kFALSE);
   Double_t GetNetPE();
-  Double_t GetNetE(){return GetNetKE()+GetNetPE();}
+  Double_t GetNetE(const Bool_t SR=kFALSE){return GetNetKE(SR)+GetNetPE();}
   
 
   //Inspection Deriving and Pre-Deriving.
