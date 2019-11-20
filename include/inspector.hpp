@@ -7,10 +7,10 @@
 
 class event;
 
-class inspectorT{
+class inspector{
   public:
-  inspectorT(){}
-  ~inspectorT(){}
+  inspector(){}
+  ~inspector(){}
   
   virtual Bool_t  Inspect(){return kFALSE;}
   virtual Float_t Evaluate(){return 0.;}
@@ -32,7 +32,7 @@ class inspectorT{
 
 };
 
-class inspectorP: public inspectorT{ //Calculator, Static
+class inspectorP: public inspector{ //Calculator, Static
   public:
   inspectorP(particle *p1_, particle *p2_, TString method_, Float_t val_=-1);
   
@@ -68,7 +68,7 @@ class inspectorP: public inspectorT{ //Calculator, Static
 };
 
 
-class inspectorE: public inspectorT{
+class inspectorE: public inspector{
   public:
   inspectorE(event* event_, TString method_, Float_t val_=-1);
 

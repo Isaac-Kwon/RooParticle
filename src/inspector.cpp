@@ -18,7 +18,7 @@ Float_t XVCosine(particle* p1, particle* p2){
 //   return (dX*dV)/(TMath::Sqrt(dX.Norm2Sqr() * dV.Norm2Sqr()));
 // }
 
-inspectorP::inspectorP(particle *p1_, particle *p2_, TString method_, Float_t val_): inspectorT(){
+inspectorP::inspectorP(particle *p1_, particle *p2_, TString method_, Float_t val_): inspector(){
   SetParticles(p1_,p2_);
   SetMethod(method_);
   SetValue(val_);
@@ -134,7 +134,7 @@ Bool_t inspectorP::SetInitial_D(Bool_t index, TString mtd,Double_t var){ //set p
 //   return kTRUE;
 // }
 
-TString inspectorT::Print(Bool_t element, Bool_t mechanics, Bool_t mute, Bool_t pprint){
+TString inspector::Print(Bool_t element, Bool_t mechanics, Bool_t mute, Bool_t pprint){
   return TString("");
 }
 
@@ -172,7 +172,7 @@ TString inspectorP::Print(Bool_t particles, Bool_t mechanics, Bool_t mute, Bool_
 
 //========================================//
 
-inspectorE::inspectorE(event* event_, TString method_, Float_t val_): inspectorT(){
+inspectorE::inspectorE(event* event_, TString method_, Float_t val_): inspector(){
   SetEvent(event_);
   SetMethod(method_);
   SetValue(val_);

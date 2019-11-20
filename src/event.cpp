@@ -34,7 +34,7 @@ event::event(event &e){
   }
 
   //copy inspectors : link all particles in each inspectors
-  vector<inspectorT*>::iterator ii_;
+  vector<inspector*>::iterator ii_;
 
   Int_t ip1=0, ip2=0;
   for(ii_=e.inspectors.begin(); ii_!=e.inspectors.end(); ii_++){
@@ -175,9 +175,9 @@ force * event::getForce(Int_t index){
   return f1;
 }
 
-inspectorT * event::getInspector(Int_t index){
-  vector<inspectorT*>::iterator p1_;
-  inspectorT* p1;
+inspector * event::getInspector(Int_t index){
+  vector<inspector*>::iterator p1_;
+  inspector* p1;
 
   Int_t i=0;
   if(index >= getNInspector()){
@@ -270,8 +270,8 @@ void event::DeriveInspect(Int_t iperiod){
 }
 
 Bool_t event::Inspect(){
-  vector<inspectorT*>::iterator i_;
-  inspectorT* i;
+  vector<inspector*>::iterator i_;
+  inspector* i;
   Bool_t result=kTRUE;
 
   for(i_=inspectors.begin(); i_!=inspectors.end(); i_++){
@@ -315,7 +315,7 @@ TString event::Print(Bool_t onlymechanic, Bool_t mute, Bool_t pprint){
     if(pprint){
       result += "\n";
     }
-    std::vector<inspectorT*>::iterator i;
+    std::vector<inspector*>::iterator i;
     for(i=inspectors.begin(); i<inspectors.end(); i++){
       result += (*i)->Print(kTRUE, kTRUE, kTRUE, pprint);
     }
@@ -340,7 +340,7 @@ TString event::Print(Bool_t onlymechanic, Bool_t mute, Bool_t pprint){
 
 //   return kTRUE;
 
-//   std::vector<inspectorT*>::iterator i;
+//   std::vector<inspector*>::iterator i;
 //   for(i=inspectors.begin(); i<inspectors.end(); ++i){
 //     (*i)->SetInitial();
 //   }

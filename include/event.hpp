@@ -16,7 +16,7 @@
 #include "inspector.hpp"
 #include "recorder.hpp"
 
-class inspectorT;
+class inspector;
 
 //class for one event.
 class event{
@@ -28,7 +28,7 @@ public:
   //Setup Methods
   particle* AddParticle(particle* particle_){particles.push_back(particle_); nparticle++; return particle_;}
   void AddForce(force * force_){forces.push_back(force_); nforce++;}
-  void AddInspector(inspectorT* inspector_){inspectors.push_back(inspector_);}
+  void AddInspector(inspector* inspector_){inspectors.push_back(inspector_);}
   void SetVolume(eventVolume * volume_){volume = volume_;}
 
   //DerivingMethod
@@ -40,7 +40,7 @@ public:
   //GetMethod
   particle * getParticle(Int_t index);
   force * getForce(Int_t index);
-  inspectorT * getInspector(Int_t index);
+  inspector * getInspector(Int_t index);
   Int_t getNParticle(){return nparticle;}
   Int_t getNForce(){return nforce;}
   Int_t getNInspector(){return inspectors.size();}
@@ -71,7 +71,7 @@ private:
   event * pEvent;
   Bool_t preDerived = kFALSE;
   
-  std::vector<inspectorT*> inspectors;
+  std::vector<inspector*> inspectors;
 };
 
 #endif
