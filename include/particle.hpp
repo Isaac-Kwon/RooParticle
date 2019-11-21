@@ -5,11 +5,11 @@
 #include "TString.h"
 #include "TVector3.h"
 
+// #include "event.hpp"
 #include "path.hpp"
 
 class inspector;
-
-// using namespace std;
+class event;
 
 class particle{
 public:
@@ -27,6 +27,9 @@ public:
   void holdForce(const TVector3 f);
   void releaseForce(const Double_t dt);
   void resetHold();
+
+  TVector3 calculateCalibrateVelocity(event* ev_, Bool_t ignoreInvincible=kFALSE);
+  TVector3 calibrateVelocity(event* ev_, Bool_t ignoreInvincible=kFALSE, Bool_t verbose=kFALSE);
 
   //Applying Methods
   void applyMechanic(const TVector3 x_, const TVector3 v_){x = x_; v = v_;}
