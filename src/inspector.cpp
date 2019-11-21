@@ -187,6 +187,14 @@ Bool_t inspectorE::Inspect(){
     return (evt->GetNetPE()>val);
   }else if(ftn=="PEL"){
     return (evt->GetNetPE()<val);
+  }else if(ftn=="DXG"){
+    return (evt->GetDeriveN(kFALSE)>val);
+  }else if(ftn=="DXL"){
+    return (evt->GetDeriveN(kTRUE)<val);
+  }else if(ftn=="DNG"){
+    return (evt->GetDeriveN(kFALSE)>val);  
+  }else if(ftn=="DNL"){
+    return (evt->GetDeriveN(kTRUE)<val);  
   }else{
     std::cerr<<"inspectorE::Inspect : inspecting method isn't defined well." << std::endl;
     return kFALSE;
@@ -199,6 +207,10 @@ Double_t inspectorE::Evaluate(){
     return evt->GetNetKE();
   }else if(ftn=="PEG" || ftn=="PEL"){
     return evt->GetNetPE();
+  }else if(ftn=="DXG" || ftn=="DXL"){
+    return evt->GetDeriveN(kFALSE);
+  }else if(ftn=="DNG" || ftn=="DNL"){
+    return evt->GetDeriveN(kTRUE);  
   }else{
     std::cerr<<"inspectorE::Inspect : inspecting method isn't defined well." << std::endl;
     return kFALSE;

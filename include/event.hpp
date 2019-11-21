@@ -45,6 +45,8 @@ public:
   Int_t getNForce(){return nforce;}
   Int_t getNInspector(){return inspectors.size();}
 
+  Long_t GetDeriveN(const Bool_t minima=kFALSE);
+
   //Calculation
   Double_t GetPE(Int_t index);
   Double_t GetPE(particle* p);

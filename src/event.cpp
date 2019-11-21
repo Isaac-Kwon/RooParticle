@@ -195,6 +195,19 @@ inspector * event::getInspector(Int_t index){
   return p1;
 }
 
+Long_t event::GetDeriveN(const Bool_t minima){
+  
+  vector<particle*>::iterator p_;
+  // particle *p;
+
+  Long_t result = minima ? std::numeric_limits<Long_t>::max() : std::numeric_limits<Long_t>::min();
+  for(p_=particles.begin(); p_!=particles.end(); p_++){
+    result = minima ? TMath::Min(result, (*p_)->GetECNT()) : TMath::Max(result, (*p_)->GetECNT());
+  }
+  return result;
+
+}
+
 Double_t event::GetNetKE(const Bool_t SR){
 
   vector<particle*>::iterator p_;
