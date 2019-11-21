@@ -48,8 +48,8 @@ public:
   Long_t GetDeriveN(const Bool_t minima=kFALSE);
 
   //Calculation
-  Double_t GetPE(Int_t index);
-  Double_t GetPE(particle* p);
+  Double_t GetPE(Int_t index, Bool_t OnlyInvincibles=kFALSE);
+  Double_t GetPE(particle* p, Bool_t OnlyInvincibles=kFALSE);
   Double_t GetNetKE(const Bool_t SR=kFALSE);
   Double_t GetNetPE();
   Double_t GetNetE(const Bool_t SR=kFALSE){return GetNetKE(SR)+GetNetPE();}
