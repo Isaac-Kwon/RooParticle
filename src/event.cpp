@@ -265,7 +265,8 @@ Double_t event::GetNetPE(){
   Int_t i;
   Double_t tempPE = 0.;
   for(i=0; i<getNParticle(); i++){
-    tempPE += GetPE(i);
+    // std::cout<<"GETPARTICLEPE "<<i<<std::endl;
+    tempPE += 0.5*(GetPE(i));
   }
   return tempPE;
 }
