@@ -5,10 +5,12 @@
 #include "TVector3.h"
 
 #include "particle.hpp"
+#include "event.hpp"
 
 #include <math.h>
 
 using namespace std;
+
 
 // particle::particle(){
 // }
@@ -71,6 +73,33 @@ void particle::releaseForce(const Double_t dt){
 void particle::resetHold(){
   hold=false;
   hF = TVector3();
+}
+
+TVector3 particle::calculateCalibrateVelocity(event* ev_, Bool_t ignoreInvincible){
+  TVector3 result;
+  Double_t resultmag;
+  Double_t Unet = ev_->GetPE(this, kFALSE);
+  Double_t UnetI = ev_->GetPE(this, kTRUE);
+  // std::cout<<"UNUT\t"<<Unet<<std::endl;
+  // std::cout<<"UNUTI\t"<<UnetI<<std::endl;
+  if ((!ignoreInvincible)&&IsInvincible())return TVector3();
+
+  resultmag = TMath::Sqrt(  GetV().Mag2() - ((1/GetM())*Unet+(1/GetM())*UnetI)  )-GetV().Mag();
+
+  result = resultmag*GetV().Unit();
+  // result.Print();
+  
+  return result;
+}
+
+TVector3 particle::calibrateVelocity(event* ev_, Bool_t ignoreInvincible, Bool_t verbose){
+  TVector3 result = calculateCalibrateVelocity(ev_, ignoreInvincible);
+  // if ((!ignoreInvincible)&&IsInvincible())return TVector3();
+  Double_t e1 = GetKE();  
+  v += result;
+  Double_t e2 = GetKE();  
+  if(verbose) cout<<"BEFORE\t"<< e1 <<"\tAFTER\t" << e2 <<"\tDIFF\t" <<e2-e1<<std::endl;
+  return result;
 }
 
 void particle::applyForce(const TVector3 f, const Double_t dt, const Bool_t SR){

@@ -77,6 +77,17 @@ event::~event(){
   }
 }
 
+void event::CalibrateVelocity(){
+  vector<particle*>::iterator p_;
+  particle *p;
+
+  for(p_=particles.begin(); p_!=particles.end(); p_++){
+    p=*p_;
+    if(p->IsInvincible()) continue;
+    p->calibrateVelocity(this);
+  }
+}
+
 void event::DeriveDT(Double_t dt){
   // Int_t pi, pj, fi;
   vector<particle*>::iterator p1_;

@@ -31,6 +31,8 @@ public:
   void AddInspector(inspector* inspector_){inspectors.push_back(inspector_);}
   void SetVolume(eventVolume * volume_){volume = volume_;}
 
+  void CalibrateVelocity();
+  
   //DerivingMethod
   virtual void DeriveDT(Double_t dt = 1);
   void DeriveDTN(Int_t n = 1, Double_t dt = 1);
