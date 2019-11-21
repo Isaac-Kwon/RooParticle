@@ -7,24 +7,24 @@
 
 #include "inspector.hpp"
 
-Float_t XVCosine(particle* p1, particle* p2){
+Double_t XVCosine(particle* p1, particle* p2){
     TVector3 dX = (p1->GetX())-(p2->GetX());
     TVector3 dV = (p1->GetV())-(p2->GetV());
     Double_t cc = (dX*dV)/(dX.Mag() * dV.Mag());
     return cc;
 }
 
-// Float_t XVCosine(TVector3 dX, TVector3 dV){
+// Double_t XVCosine(TVector3 dX, TVector3 dV){
 //   return (dX*dV)/(TMath::Sqrt(dX.Norm2Sqr() * dV.Norm2Sqr()));
 // }
 
-inspectorP::inspectorP(particle *p1_, particle *p2_, TString method_, Float_t val_): inspector(){
+inspectorP::inspectorP(particle *p1_, particle *p2_, TString method_, Double_t val_): inspector(){
   SetParticles(p1_,p2_);
   SetMethod(method_);
   SetValue(val_);
 }
 
-Float_t inspectorP::Evaluate(){
+Double_t inspectorP::Evaluate(){
   if(ftn=="COS"){
     return CalculateCosine();
   }else if(ftn=="DEG"){
@@ -50,14 +50,14 @@ Bool_t inspectorP::Inspect(){
     return Evaluate()<val;
 }
 
-Float_t inspectorP::CalculateCosine(){
+Double_t inspectorP::CalculateCosine(){
     TVector3 dX = (p1->GetX())-(p2->GetX());
     TVector3 dV = (p1->GetV())-(p2->GetV());
     Double_t cc = (dX*dV)/(dX.Mag() * dV.Mag());
     return cc;
 }
 
-Float_t inspectorP::CalculateAngle(Bool_t rad){
+Double_t inspectorP::CalculateAngle(Bool_t rad){
     Double_t cc = CalculateCosine();
     if(rad){
       return TMath::ACos(cc);
@@ -66,7 +66,7 @@ Float_t inspectorP::CalculateAngle(Bool_t rad){
     }
 }
 
-Float_t inspectorP::CaculateSPD(){
+Double_t inspectorP::CaculateSPD(){
   return ((p1->GetV())-(p2->GetV())).Mag();
 }
 
@@ -172,7 +172,7 @@ TString inspectorP::Print(Bool_t particles, Bool_t mechanics, Bool_t mute, Bool_
 
 //========================================//
 
-inspectorE::inspectorE(event* event_, TString method_, Float_t val_): inspector(){
+inspectorE::inspectorE(event* event_, TString method_, Double_t val_): inspector(){
   SetEvent(event_);
   SetMethod(method_);
   SetValue(val_);
@@ -194,7 +194,7 @@ Bool_t inspectorE::Inspect(){
   return kFALSE;
 }
 
-Float_t inspectorE::Evaluate(){
+Double_t inspectorE::Evaluate(){
   if(ftn=="KEG" || ftn=="KEL"){
     return evt->GetNetKE();
   }else if(ftn=="PEG" || ftn=="PEL"){
