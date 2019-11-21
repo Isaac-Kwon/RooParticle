@@ -209,11 +209,11 @@ Double_t event::GetNetKE(const Bool_t SR){
   return tempKE;
 }
 
-Double_t event::GetPE(Int_t index){
-  return GetPE(getParticle(index));
+Double_t event::GetPE(Int_t index, Bool_t OnlyInvincibles){
+  return GetPE(getParticle(index), OnlyInvincibles);
 }
 
-Double_t event::GetPE(particle* p){
+Double_t event::GetPE(particle* p, Bool_t OnlyInvincibles){
   vector<particle*>::iterator pt_;
   vector<force*>::iterator    ff_;
 
@@ -222,8 +222,6 @@ Double_t event::GetPE(particle* p){
 
   Double_t tempPE = 0.;
 
-  if(p->IsInvincible()) return 0;
-
   for(pt_=particles.begin(); pt_!=particles.end(); pt_++){
     pt = *pt_;
     if(pt==p){
@@ -231,7 +229,7 @@ Double_t event::GetPE(particle* p){
     }
     for(ff_=forces.begin(); ff_!=forces.end(); ff_++){
       ff = *ff_;
-      
+      if((!(pt->IsInvincible()))&&OnlyInvincibles)continue;
       tempPE += ff->Potential(p, pt);
     }
   }
