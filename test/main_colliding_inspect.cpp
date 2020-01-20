@@ -119,27 +119,20 @@ int main(){
 
     exp->makeEvent(p1, p2);
 
-    exp->getEvent()->AddInspector(new inspector(p1, p2, "DEG", 1));
-    exp->getEvent()->AddInspector(new inspector(p1, p2, "CNT", 50000));
+    exp->getEvent()->AddInspector(new inspectorP(p1, p2, "DEG", 1));
+    exp->getEvent()->AddInspector(new inspectorP(p1, p2, "CNT", 50000));
     
-    exp->getEvent()->DeriveInspect(1,false);
+    exp->getEvent()->DeriveInspect(1);
     // FTE->getEvent()->DeriveDTN(1,10);
 
     imp_tree = imp;
     NPOINT_tree = p1->GetPath()->GetMaxNumber();
-    // std::cout<<"1";
     vxF1_tree = p1->GetPath()->GetLastV().operator[](0);
-    // std::cout<<"2";
     vyF1_tree = p1->GetPath()->GetLastV().operator[](1);
-    // std::cout<<"3";
     SAngle1_tree = angleXD(p1->GetPath()->GetLastV());
-    // std::cout<<"4";
     vxF2_tree = p2->GetPath()->GetLastV().operator[](0);
-    // std::cout<<"5";
     vyF2_tree = p2->GetPath()->GetLastV().operator[](1);
-    // std::cout<<"6";
     SAngle2_tree = angleXD(p2->GetPath()->GetLastV());
-    // std::cout<<"7"<<std::endl;
     p2->GetPath()->GetDCA(x1, DCA_tree, outtime_free);
 
     tree->Fill();

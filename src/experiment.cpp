@@ -26,7 +26,6 @@ void experiment::MakeEvent(Int_t ninparticle, ...){
 void experimentP::MakeEvent(particle* p1, ...){
     eventOn = kTRUE;
     currentEvent = new event(*eventT);
-
     particle* p=p1;
     va_list argList;
     currentEvent->AddParticle(p1);

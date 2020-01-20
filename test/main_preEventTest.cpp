@@ -103,11 +103,11 @@ int main(int argc, char** argv){
         cout<<"CR EVENT "<<i<<endl;
         exp1->makeEvent(p11);
         exp2->makeEvent(p12);
-        exp1->getEvent()->AddInspector(new inspector(exp1->getEvent()->getParticle(0), p11, "DEG", 1.));
+        exp1->getEvent()->AddInspector(new inspectorP(exp1->getEvent()->getParticle(0), p11, "DEG", 1.));
         // exp2->getEvent()->AddInspector(new inspector(exp2->getEvent()->getParticle(0), p12, "DEG", 0.1));
 
         // exp2->getEvent()->Print();
-        exp1->getEvent()->DeriveInspect(1,false);
+        exp1->getEvent()->DeriveInspect(1);
         exp2->getEvent()->DeriveDTN(50000);
 
         x1t = exp1->getEvent()->getParticle(1)->GetX();

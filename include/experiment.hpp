@@ -13,8 +13,7 @@ public:
   experiment(){}
   experiment(event* eventT_);
   void SetTemplate(event* eventT_){eventT=eventT_;}
-  virtual void MakeEvent(particle* p1, ...){return;}
-  void MakeEvent(Int_t ninparticle, ...);
+  void MakeEvent(Int_t ninparticle_, ...);
   void OffEvent(){eventOn=false;}
   void DelEvent(){eventOn=false; delete currentEvent;}
   event* GetEvent(){return currentEvent;}

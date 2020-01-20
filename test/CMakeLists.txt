@@ -3,11 +3,15 @@ set(TEST_EXE_ROOT
   test_rutherford
   test_rutherford_inspect
   test_rutherford_inspect_odd
+  test_rutherford_inspect_oneparticle_tracksave
+  test_rutherford_inspect_oneparticle_showtrack
   test_rutherford_recorder
   test_collider_HeHe
   test_colliding_inspect
   test_colliding_inspect_odd
   test_3body_uniform
+  test_3body_oneline
+  test_3body_showtrack
   test_preEventTest
 )
 

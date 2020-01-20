@@ -7,31 +7,24 @@
 
 #include "inspector.hpp"
 
-Float_t XVCosine(particle* p1, particle* p2){
+Double_t XVCosine(particle* p1, particle* p2){
     TVector3 dX = (p1->GetX())-(p2->GetX());
     TVector3 dV = (p1->GetV())-(p2->GetV());
     Double_t cc = (dX*dV)/(dX.Mag() * dV.Mag());
     return cc;
 }
 
-// Float_t XVCosine(TVector3 dX, TVector3 dV){
+// Double_t XVCosine(TVector3 dX, TVector3 dV){
 //   return (dX*dV)/(TMath::Sqrt(dX.Norm2Sqr() * dV.Norm2Sqr()));
 // }
 
-inspector::inspector(){
+inspectorP::inspectorP(particle *p1_, particle *p2_, TString method_, Double_t val_): inspector(){
+  SetParticles(p1_,p2_);
+  SetMethod(method_);
+  SetValue(val_);
 }
 
-inspector::inspector(particle *p1_, particle *p2_, TString method_, Float_t val_){
-    p1 = p1_;
-    p2 = p2_;
-    ftn = method_;
-    val = val_;
-}
-
-inspector::~inspector(){
-}
-
-Float_t inspector::Evaluate(){
+Double_t inspectorP::Evaluate(){
   if(ftn=="COS"){
     return CalculateCosine();
   }else if(ftn=="DEG"){
@@ -40,7 +33,9 @@ Float_t inspector::Evaluate(){
     return CalculateAngle(kTRUE);
   }else if(ftn=="CNT"){
     return CountDeriving();
-  }{
+  }else if(ftn=="SPDG" || ftn=="SPDL"){
+    return CaculateSPD();
+  }else{
     std::cout<<"No Function Name Defined / "<< ftn << std::endl;
     return kFALSE;
   }
@@ -48,21 +43,21 @@ Float_t inspector::Evaluate(){
   return kFALSE;
 }
 
-Bool_t inspector::Inspect(){
-    if(ftn=="CNT"){
+Bool_t inspectorP::Inspect(){
+    if(ftn=="CNT" || ftn=="SPDG"){
       return Evaluate()>val;
     }
     return Evaluate()<val;
 }
 
-Float_t inspector::CalculateCosine(){
+Double_t inspectorP::CalculateCosine(){
     TVector3 dX = (p1->GetX())-(p2->GetX());
     TVector3 dV = (p1->GetV())-(p2->GetV());
     Double_t cc = (dX*dV)/(dX.Mag() * dV.Mag());
     return cc;
 }
 
-Float_t inspector::CalculateAngle(Bool_t rad){
+Double_t inspectorP::CalculateAngle(Bool_t rad){
     Double_t cc = CalculateCosine();
     if(rad){
       return TMath::ACos(cc);
@@ -71,12 +66,16 @@ Float_t inspector::CalculateAngle(Bool_t rad){
     }
 }
 
-Long_t inspector::CountDeriving(){
+Double_t inspectorP::CaculateSPD(){
+  return ((p1->GetV())-(p2->GetV())).Mag();
+}
+
+Long_t inspectorP::CountDeriving(){
   return min(p1->GetECNT(), p2->GetECNT());
 
 }
 
-Bool_t inspector::SetInitial_D(Bool_t index, TString mtd,Double_t var){ //set primary condition from present condition
+Bool_t inspectorP::SetInitial_D(Bool_t index, TString mtd,Double_t var){ //set primary condition from present condition
   // if index=0(false) -> move p1, index=1(true) -> move p2
   
   // Initial position solver
@@ -122,7 +121,7 @@ Bool_t inspector::SetInitial_D(Bool_t index, TString mtd,Double_t var){ //set pr
   Double_t A2 = cos0-TMath::Sqrt(1-TMath::Power(cos0,2))*(cos1/TMath::Sqrt(1-TMath::Power(cos1,2)));  
   Double_t A = A1*A2;
 
-  p0_->x -= A*p0_->v;
+  p0_->x -= A*(p0_->GetV());
 
 
   return kTRUE;
@@ -131,13 +130,17 @@ Bool_t inspector::SetInitial_D(Bool_t index, TString mtd,Double_t var){ //set pr
   // cos th1 :: settedvalue
 }
 
-Bool_t inspector::SetInitial(Bool_t index, TString mtd, Double_t var){
-  return kTRUE;
+// Bool_t inspectorP::SetInitial(Bool_t index, TString mtd, Double_t var){
+//   return kTRUE;
+// }
+
+TString inspector::Print(Bool_t element, Bool_t mechanics, Bool_t mute, Bool_t pprint){
+  return TString("");
 }
 
 
 
-TString inspector::Print(Bool_t particles, Bool_t mechanics, Bool_t mute, Bool_t pprint){
+TString inspectorP::Print(Bool_t particles, Bool_t mechanics, Bool_t mute, Bool_t pprint){
   TString result = TString("");
   result += TString("[ Inspector Particle: ");
   if(particles){
@@ -164,6 +167,55 @@ TString inspector::Print(Bool_t particles, Bool_t mechanics, Bool_t mute, Bool_t
   }
   return result;
     
+}
+
+
+//========================================//
+
+inspectorE::inspectorE(event* event_, TString method_, Double_t val_): inspector(){
+  SetEvent(event_);
+  SetMethod(method_);
+  SetValue(val_);
+}
+
+Bool_t inspectorE::Inspect(){
+  if(ftn=="KEG"){
+    return (evt->GetNetKE()>val);
+  }else if(ftn=="KEL"){
+    return (evt->GetNetKE()<val);
+  }else if(ftn=="PEG"){
+    return (evt->GetNetPE()>val);
+  }else if(ftn=="PEL"){
+    return (evt->GetNetPE()<val);
+  }else if(ftn=="DXG"){
+    return (evt->GetDeriveN(kFALSE)>val);
+  }else if(ftn=="DXL"){
+    return (evt->GetDeriveN(kTRUE)<val);
+  }else if(ftn=="DNG"){
+    return (evt->GetDeriveN(kFALSE)>val);  
+  }else if(ftn=="DNL"){
+    return (evt->GetDeriveN(kTRUE)<val);  
+  }else{
+    std::cerr<<"inspectorE::Inspect : inspecting method isn't defined well." << std::endl;
+    return kFALSE;
+  }
+  return kFALSE;
+}
+
+Double_t inspectorE::Evaluate(){
+  if(ftn=="KEG" || ftn=="KEL"){
+    return evt->GetNetKE();
+  }else if(ftn=="PEG" || ftn=="PEL"){
+    return evt->GetNetPE();
+  }else if(ftn=="DXG" || ftn=="DXL"){
+    return evt->GetDeriveN(kFALSE);
+  }else if(ftn=="DNG" || ftn=="DNL"){
+    return evt->GetDeriveN(kTRUE);  
+  }else{
+    std::cerr<<"inspectorE::Inspect : inspecting method isn't defined well." << std::endl;
+    return kFALSE;
+  }
+  return kFALSE;
 }
 
 

@@ -20,11 +20,6 @@
 #include "TTree.h"
 #include "TFile.h"
 #include "TRandom3.h"
-#include "TApplication.h"
-#include "TCanvas.h"
-#include "TGraph.h"
-
-TApplication * app;
 
 class FixedTargetExperiment{
 public:
@@ -45,6 +40,9 @@ void FixedTargetExperiment::makeEvent(particle* p){
   currentEvent = new event(*eventT);
   currentEvent->AddParticle(p);
 }
+
+
+
 
 TVector3 unitv(TVector3 v){
   TVector3 result = TVector3();
@@ -164,14 +162,6 @@ int Experiment(Double_t ImpactParameter,
     FTE->delEvent();
 
   tree->Print();
-
-  TCanvas * c1 = new TCanvas("c1", "c1", 600, 400);
-  c1->cd();
-  tree->Draw("x:y", "", "goff");
-  TGraph * g1 = new TGraph(tree->GetEntries(), tree->GetV1(), tree->GetV2());
-  g1->Draw();
-  
-  app->Run();
   hfile->Close();
   delete hfile;
 
@@ -197,7 +187,7 @@ int main(int argc, char *argv[]){
 
   //Default setting
   Double_t ImpactParameter         = 50.;
-  TString  outputFilename          = "Data/test_rutherford_inspect_oneparticle_showtrack.root";
+  TString  outputFilename          = "Data/test_rutherford_inspect_oneparticle_tracksave.root";
   Double_t derivingDegreeCriterion = 1;
   Int_t    derivingMinimumPoint    = 50000;
   Double_t startingMinimumDistance = 5000;
@@ -285,9 +275,6 @@ int main(int argc, char *argv[]){
   std::cout<<"Output File's Name (o) : "<< outputFilename << " " << (!f_outputFilename ? "(Default)" : " ") << std::endl;
   std::cout<<"Autosave Period (S) : " << autosavePeriod << " " << (!f_autosavePeriod ? "(Default)" : " ") << std::endl;
   std::cout<<"===========================================" << std::endl << std::endl;
-
-  app = new TApplication("app",&argc, argv);
-  // app->Run();
 
   return Experiment(ImpactParameter, outputFilename, derivingDegreeCriterion, derivingMinimumPoint, velocity, startingMinimumDistance, autosavePeriod);
 

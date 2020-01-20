@@ -145,8 +145,8 @@ int Experiment(Int_t nparticle, Int_t randomseed,
 
     FTE->makeEvent(p2);
 
-    FTE->getEvent()->AddInspector(new inspector(FTE->getEvent()->getParticle(0), p2, "DEG", derivingDegreeCriterion));
-    FTE->getEvent()->AddInspector(new inspector(FTE->getEvent()->getParticle(0), p2, "CNT", derivingMinimumPoint));
+    FTE->getEvent()->AddInspector(new inspectorP(FTE->getEvent()->getParticle(0), p2, "DEG", derivingDegreeCriterion));
+    FTE->getEvent()->AddInspector(new inspectorP(FTE->getEvent()->getParticle(0), p2, "CNT", derivingMinimumPoint));
     
     recorderD * DCARecorder = new recorderD(numeric_limits<Double_t>::max());
     

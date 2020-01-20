@@ -16,10 +16,9 @@
 #include "inspector.hpp"
 #include "recorder.hpp"
 
-using namespace std;
+class inspector;
 
 //class for one event.
-
 class event{
 public:
   event();
@@ -32,11 +31,13 @@ public:
   void AddInspector(inspector* inspector_){inspectors.push_back(inspector_);}
   void SetVolume(eventVolume * volume_){volume = volume_;}
 
+  void CalibrateVelocity();
+  
   //DerivingMethod
   virtual void DeriveDT(Double_t dt = 1);
   void DeriveDTN(Int_t n = 1, Double_t dt = 1);
   void DeriveMAX(Double_t dt = 1);
-  void DeriveInspect(Int_t iperiod=1, Bool_t verbose=kFALSE, Int_t vperiod=1000);
+  void DeriveInspect(Int_t iperiod=1);
 
   //GetMethod
   particle * getParticle(Int_t index);
@@ -45,6 +46,16 @@ public:
   Int_t getNParticle(){return nparticle;}
   Int_t getNForce(){return nforce;}
   Int_t getNInspector(){return inspectors.size();}
+
+  Long_t GetDeriveN(const Bool_t minima=kFALSE);
+
+  //Calculation
+  Double_t GetPE(Int_t index, Bool_t OnlyInvincibles=kFALSE);
+  Double_t GetPE(particle* p, Bool_t OnlyInvincibles=kFALSE);
+  Double_t GetNetKE(const Bool_t SR=kFALSE);
+  Double_t GetNetPE();
+  Double_t GetNetE(const Bool_t SR=kFALSE){return GetNetKE(SR)+GetNetPE();}
+  
 
   //Inspection Deriving and Pre-Deriving.
   void preDerive();
@@ -55,7 +66,6 @@ public:
   Bool_t SetInitial();
 
 protected:
-  
   std::vector<particle*> particles;
   std::vector<force*> forces;
 
