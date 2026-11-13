@@ -57,6 +57,8 @@
 ## 2. 확인이 필요한 것 (실행해 보지 못함)
 
 - [ ] **GitHub Actions** (`.github/workflows/ci.yml`): YAML 문법만 확인했다. 푸시해서 `rootproject/root` 이미지에서 도는지 확인.
+- [ ] **GitHub Pages 문서 배포** (`.github/workflows/docs.yml`): `master` 푸시 때 Doxygen 문서를 배포한다.
+  저장소 Settings → Pages → Source를 "GitHub Actions"로 한 번 바꿔야 동작한다. 아직 실행해 보지 못했다.
 - [ ] **Condor 파일** (`macro/condor/`): 실행 파일 이름 오타를 고치고 스크립트에 `set -e`, `make -j4`를 넣었다. 클러스터에서 확인 필요.
   clone 주소가 아직 CERN GitLab이다. 또 `title ClusterId ProcId`를 넘기므로 작업 번호가 ClusterId, 시드가 ProcId가 되어
   `queue N`(N>1)이면 한 클러스터의 모든 작업이 같은 파일에 쓴다. `ProcId`를 작업 번호로 넘기도록 바꿔야 한다.
