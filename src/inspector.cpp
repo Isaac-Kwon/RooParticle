@@ -6,6 +6,9 @@
 #include "TMath.h"
 
 #include "inspector.hpp"
+#include "asymptoteN.hpp"
+
+#include <limits>
 
 Double_t XVCosine(particle* p1, particle* p2){
     TVector3 dX = (p1->GetX())-(p2->GetX());
@@ -18,52 +21,120 @@ Double_t XVCosine(particle* p1, particle* p2){
 //   return (dX*dV)/(TMath::Sqrt(dX.Norm2Sqr() * dV.Norm2Sqr()));
 // }
 
+// The name is parsed once (SetMethod) ; names and enumerators are listed here only.
+static const struct {const char * name; inspector::methodID id;} gMethodTable[] = {
+  {"COS",  inspector::kCOS},  {"DEG",  inspector::kDEG},  {"RAD",  inspector::kRAD},
+  {"CNT",  inspector::kCNT},  {"SPDG", inspector::kSPDG}, {"SPDL", inspector::kSPDL},
+  {"DSTG", inspector::kDSTG}, {"DSTL", inspector::kDSTL}, {"VRG",  inspector::kVRG},
+  {"VRL",  inspector::kVRL},
+  {"KEG",  inspector::kKEG},  {"KEL",  inspector::kKEL},  {"PEG",  inspector::kPEG},
+  {"PEL",  inspector::kPEL},  {"PKG",  inspector::kPKG},  {"PKL",  inspector::kPKL},
+  {"EDG",  inspector::kEDG},  {"EDL",  inspector::kEDL},  {"TMG",  inspector::kTMG},
+  {"TML",  inspector::kTML},  {"DXG",  inspector::kDXG},  {"DXL",  inspector::kDXL},
+  {"DNG",  inspector::kDNG},  {"DNL",  inspector::kDNL},  {"DSG",  inspector::kDSG},
+  {"DSL",  inspector::kDSL},  {"ACG",  inspector::kACG},  {"ACL",  inspector::kACL},
+  {"VOUT", inspector::kVOUT}, {"VOUTA",inspector::kVOUTA},
+  {"ASYD", inspector::kASYD}, {"ASYV", inspector::kASYV}
+};
+
+inspector::methodID inspector::ParseMethod(TString name){
+  for(const auto & e : gMethodTable){
+    if(name==e.name) return e.id;
+  }
+  return kInvalid;
+}
+
+TString inspector::MethodName(methodID id){
+  for(const auto & e : gMethodTable){
+    if(e.id==id) return TString(e.name);
+  }
+  return TString("");
+}
+
 inspectorP::inspectorP(particle *p1_, particle *p2_, TString method_, Double_t val_): inspector(){
   SetParticles(p1_,p2_);
   SetMethod(method_);
   SetValue(val_);
 }
 
+inspectorP::inspectorP(particle *p1_, particle *p2_, methodID method_, Double_t val_): inspector(){
+  SetParticles(p1_,p2_);
+  SetMethod(method_);
+  SetValue(val_);
+}
+
 Double_t inspectorP::Evaluate(){
-  if(ftn=="COS"){
-    return CalculateCosine();
-  }else if(ftn=="DEG"){
-    return CalculateAngle(kFALSE);
-  }else if(ftn=="RAD"){
-    return CalculateAngle(kTRUE);
-  }else if(ftn=="CNT"){
-    return CountDeriving();
-  }else if(ftn=="SPDG" || ftn=="SPDL"){
-    return CaculateSPD();
-  }else{
-    std::cout<<"No Function Name Defined / "<< ftn << std::endl;
-    return kFALSE;
+  switch(mtd){
+    case kCOS:  return CalculateCosine();
+    case kDEG:  return CalculateAngle(kFALSE);
+    case kRAD:  return CalculateAngle(kTRUE);
+    case kCNT:  return CountDeriving();
+    case kSPDG: case kSPDL: return CaculateSPD();
+    case kDSTG: case kDSTL: return CalculateDistance();
+    case kVRG:  case kVRL:  return CalculateRadialVelocity();
+    default:
+      std::cout<<"No Function Name Defined / "<< ftn << std::endl;
+      return kFALSE;
   }
-  std::cout<<"INSPECTING METHOD IS NOT DEFINED"<<std::endl;
-  return kFALSE;
+}
+
+Bool_t inspectorP::IsValid(){
+  return mtd>=kCOS && mtd<=kVRL;
 }
 
 Bool_t inspectorP::Inspect(){
-    if(ftn=="CNT" || ftn=="SPDG"){
+    if(!IsValid()){
+      return kFALSE;
+    }
+    // Undefined angle / cosine / radial velocity : never satisfied.
+    // (not left to NaN comparisons ; atan2(0,0) would give 0 degree and satisfy "<")
+    if((mtd==kCOS || mtd==kDEG || mtd==kRAD) && IsDegenerate(kTRUE)){
+      return kFALSE;
+    }
+    if((mtd==kVRG || mtd==kVRL) && IsDegenerate(kFALSE)){
+      return kFALSE;
+    }
+    if(mtd==kCNT || mtd==kSPDG || mtd==kDSTG || mtd==kVRG){
       return Evaluate()>val;
     }
     return Evaluate()<val;
 }
 
+Bool_t inspectorP::IsDegenerate(Bool_t needV){
+  // exact zero : the direction does not exist
+  if(((p1->GetX())-(p2->GetX())).Mag2()==0.) return kTRUE;
+  if(needV && ((p1->GetV())-(p2->GetV())).Mag2()==0.) return kTRUE;
+  return kFALSE;
+}
+
+Double_t inspectorP::CalculateDistance(){
+  return ((p1->GetX())-(p2->GetX())).Mag();
+}
+
+Double_t inspectorP::CalculateRadialVelocity(){
+  // positive : the two particles are receding from each other
+  TVector3 dX = (p1->GetX())-(p2->GetX());
+  TVector3 dV = (p1->GetV())-(p2->GetV());
+  if(dX.Mag2()==0.) return TMath::QuietNaN();
+  return (dX*dV)/dX.Mag();
+}
+
 Double_t inspectorP::CalculateCosine(){
+    if(IsDegenerate(kTRUE)) return TMath::QuietNaN();
     TVector3 dX = (p1->GetX())-(p2->GetX());
     TVector3 dV = (p1->GetV())-(p2->GetV());
     Double_t cc = (dX*dV)/(dX.Mag() * dV.Mag());
-    return cc;
+    // rounding can push it slightly out of [-1, 1]
+    return TMath::Max(-1., TMath::Min(1., cc));
 }
 
 Double_t inspectorP::CalculateAngle(Bool_t rad){
-    Double_t cc = CalculateCosine();
-    if(rad){
-      return TMath::ACos(cc);
-    }else{
-      return TMath::ACos(cc) * TMath::RadToDeg();
-    }
+    if(IsDegenerate(kTRUE)) return TMath::QuietNaN();
+    // atan2(|dX x dV|, dX.dV) keeps the precision near 0 and pi, where acos(cos) does not
+    TVector3 dX = (p1->GetX())-(p2->GetX());
+    TVector3 dV = (p1->GetV())-(p2->GetV());
+    Double_t angle = TMath::ATan2(dX.Cross(dV).Mag(), dX.Dot(dV));
+    return rad ? angle : angle * TMath::RadToDeg();
 }
 
 Double_t inspectorP::CaculateSPD(){
@@ -178,44 +249,113 @@ inspectorE::inspectorE(event* event_, TString method_, Double_t val_): inspector
   SetValue(val_);
 }
 
+inspectorE::inspectorE(event* event_, methodID method_, Double_t val_): inspector(){
+  SetEvent(event_);
+  SetMethod(method_);
+  SetValue(val_);
+}
+
+Bool_t inspectorE::IsValid(){
+  return mtd>=kKEG && mtd<=kASYV;
+}
+
 Bool_t inspectorE::Inspect(){
-  if(ftn=="KEG"){
-    return (evt->GetNetKE()>val);
-  }else if(ftn=="KEL"){
-    return (evt->GetNetKE()<val);
-  }else if(ftn=="PEG"){
-    return (evt->GetNetPE()>val);
-  }else if(ftn=="PEL"){
-    return (evt->GetNetPE()<val);
-  }else if(ftn=="DXG"){
-    return (evt->GetDeriveN(kFALSE)>val);
-  }else if(ftn=="DXL"){
-    return (evt->GetDeriveN(kTRUE)<val);
-  }else if(ftn=="DNG"){
-    return (evt->GetDeriveN(kFALSE)>val);  
-  }else if(ftn=="DNL"){
-    return (evt->GetDeriveN(kTRUE)<val);  
-  }else{
-    std::cerr<<"inspectorE::Inspect : inspecting method isn't defined well." << std::endl;
-    return kFALSE;
+  switch(mtd){
+    case kPEG: return (evt->GetNetPE()>val);
+    case kPEL: return (evt->GetNetPE()<val);
+    case kKEG: case kPKG: case kEDG: case kTMG: case kDSG: case kACG:
+      return (Evaluate()>val);
+    case kKEL: case kPKL: case kEDL: case kTML: case kDSL: case kACL:
+      return (Evaluate()<val);
+    case kVOUT:  return !(evt->IsInsideVolume(kTRUE));   // not all inside : somebody is out
+    case kVOUTA: return !(evt->IsInsideVolume(kFALSE));  // nobody inside : all are out
+    case kASYD: case kASYV: {
+      // The estimate only means "what is left" once every interacting pair
+      // is receding : before that the collision is still ahead.
+      Bool_t separating = kFALSE;
+      Double_t rest = (mtd==kASYD) ? asymptoteN::RemainingDeflection(evt, &separating)
+                                   : asymptoteN::RemainingChange(evt, &separating);
+      return separating && (rest<val);
+    }
+    case kDXG: return (evt->GetDeriveN(kFALSE)>val);
+    case kDXL: return (evt->GetDeriveN(kTRUE)<val);
+    case kDNG: return (evt->GetDeriveN(kFALSE)>val);
+    case kDNL: return (evt->GetDeriveN(kTRUE)<val);
+    default:
+      std::cerr<<"inspectorE::Inspect : inspecting method isn't defined well." << std::endl;
+      return kFALSE;
   }
-  return kFALSE;
 }
 
 Double_t inspectorE::Evaluate(){
-  if(ftn=="KEG" || ftn=="KEL"){
-    return evt->GetNetKE();
-  }else if(ftn=="PEG" || ftn=="PEL"){
-    return evt->GetNetPE();
-  }else if(ftn=="DXG" || ftn=="DXL"){
-    return evt->GetDeriveN(kFALSE);
-  }else if(ftn=="DNG" || ftn=="DNL"){
-    return evt->GetDeriveN(kTRUE);  
-  }else{
-    std::cerr<<"inspectorE::Inspect : inspecting method isn't defined well." << std::endl;
-    return kFALSE;
+  switch(mtd){
+    // Kinetic energy : the relativistic one when the relativistic mode is
+    // really in effect (Taylor ignores the setting), as for "EDG"/"EDL".
+    case kKEG: case kKEL:
+      return (evt->IsRelativistic() && evt->GetIntegrator()!=event::kTaylor) ? evt->GetNetKERel() : evt->GetNetKE();
+    case kPEG: case kPEL: return evt->GetNetPE();
+    case kDXG: case kDXL: return evt->GetDeriveN(kFALSE);
+    case kDNG: case kDNL: return evt->GetDeriveN(kTRUE);
+    case kPKG: case kPKL: {
+      Double_t ke = (evt->IsRelativistic() && evt->GetIntegrator()!=event::kTaylor) ? evt->GetNetKERel() : evt->GetNetKE();
+      if(ke==0.){
+        return std::numeric_limits<Double_t>::max();
+      }
+      return TMath::Abs(evt->GetNetPE()/ke);
+    }
+    case kEDG: case kEDL: {
+      // In relativistic mode only the relativistic energy is conserved.
+      // (Taylor ignores the relativistic setting.)
+      Bool_t rel = evt->IsRelativistic() && evt->GetIntegrator()!=event::kTaylor;
+      Double_t e = rel ? evt->GetNetERel() : evt->GetNetE();
+      if(!hasRef){
+        ref = e;
+        hasRef = kTRUE;
+      }
+      if(ref==0.){
+        return TMath::Abs(e);
+      }
+      return TMath::Abs((e-ref)/ref);
+    }
+    case kTMG: case kTML: return evt->GetTime();
+    case kDSG: case kDSL: return evt->GetMinDistance();
+    case kACG: case kACL: return evt->GetMaxAcceleration();
+    case kVOUT:  return !(evt->IsInsideVolume(kTRUE));
+    case kVOUTA: return !(evt->IsInsideVolume(kFALSE));
+    case kASYD: return asymptoteN::RemainingDeflection(evt);
+    case kASYV: return asymptoteN::RemainingChange(evt);
+    default:
+      std::cerr<<"inspectorE::Inspect : inspecting method isn't defined well." << std::endl;
+      return kFALSE;
   }
-  return kFALSE;
+}
+
+TString inspectorE::Print(Bool_t element, Bool_t mechanics, Bool_t mute, Bool_t pprint){
+  TString result = TString("");
+  result += TString("[ Inspector Event: ");
+
+  result += "MTD: ";
+  result += ftn;
+
+  result += ", CRT: ";
+  result += GetCriterion();
+
+  result += ", VAL: ";
+  result += Evaluate();
+
+  result += ", RST: ";
+  result += Inspect();
+
+  if(IsAbort()){
+    result += ", ABORT";
+  }
+
+  result += " ]";
+
+  if(!mute){
+    cout<<result<<endl;
+  }
+  return result;
 }
 
 

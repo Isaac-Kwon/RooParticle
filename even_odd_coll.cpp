@@ -1,10 +1,21 @@
+// Compare the "even" and "odd" integration results of the colliding inspect test.
+// Usage: root -l 'even_odd_coll.cpp'
+//        root -l 'even_odd_coll.cpp("even.root", "odd.root", "TT_0")'
+// Top pad: imp vs SAngle1 for both files, bottom pad: imp vs (SAngle1_even - SAngle1_odd).
+void even_odd_coll(const char * fileEven = "./build/Data/test_colliding_inspect_even_0.root",
+              const char * fileOdd  = "./build/Data/test_colliding_inspect_odd_0.root",
+              const char * treeName = "TT_0")
 {
-    TFile * file1_ = new TFile("./build/Data/test_colliding_inspect_even_0.root");
-    TFile * file2_ = new TFile("./build/Data/test_colliding_inspect_odd_0.root");
+    TFile * file1_ = TFile::Open(fileEven);
+    TFile * file2_ = TFile::Open(fileOdd);
+    if (!file1_ || file1_->IsZombie()) { Error("even_odd_coll", "cannot open %s", fileEven); return; }
+    if (!file2_ || file2_->IsZombie()) { Error("even_odd_coll", "cannot open %s", fileOdd);  return; }
 
-    TTree * tree1_ = (TTree*) file1_->Get("TT_0");
+    TTree * tree1_ = (TTree*) file1_->Get(treeName);
+    TTree * tree2_ = (TTree*) file2_->Get(treeName);
+    if (!tree1_) { Error("even_odd_coll", "no tree %s in %s", treeName, fileEven); return; }
+    if (!tree2_) { Error("even_odd_coll", "no tree %s in %s", treeName, fileOdd);  return; }
     tree1_->SetName("tree1_");
-    TTree * tree2_ = (TTree*) file2_->Get("TT_0");
     tree2_->SetName("tree2_");
 
     tree1_->AddFriend("tree2_");
@@ -18,7 +29,6 @@
     g1->SetMarkerStyle(20);
     g1->SetMarkerSize(0.8);
     g1->SetName("g1");
-    
 
     tree2_->Draw("imp:SAngle1", "", "goff");
     TGraph  * g2 = new TGraph(tree2_->GetSelectedRows(), tree2_->GetV1(),  tree2_->GetV2() );
@@ -34,7 +44,6 @@
     TMultiGraph * mg = new TMultiGraph();
     mg->Add(g1);
     mg->Add(g2);
-    // mg->Add(g3);
     p1->Draw();
     p1->cd();
     mg->Draw("AP");
@@ -42,10 +51,4 @@
     p2->Draw();
     p2->cd();
     g3->Draw("AP");
-
-    
-
-
-
-    // tree1_->AddFriend("tree2_");
 }

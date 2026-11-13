@@ -14,7 +14,12 @@ void oddevent::DeriveDT(Double_t dt){
   TVector3 tempforce = TVector3();
   for(p1_=particles.begin(); p1_!=particles.end(); p1_++){
     p1 = *p1_;
-    if(p1->IsInvincible()) continue;
+    if(p1->IsInvincible()){
+      // not moved, but the step is counted and recorded like in event::DeriveDT.
+      // (otherwise "CNT" inspectors on an invincible particle are never satisfied)
+      p1->releaseForce(dt);
+      continue;
+    }
     for(p2_=particles.begin(); p2_!=particles.end(); p2_++){
       p2 = *p2_;
       if(p1==p2){

@@ -53,7 +53,7 @@ Double_t angleXD(TVector3 v){
   return result;
 }
 
-int Experiment(Float_t ImpactParameter, Double_t velocity, Float_t dt,
+int Experiment(Double_t ImpactParameter, Double_t velocity, Float_t dt,
                TString outputFilename,
                Double_t derivingDegreeCriterion, 
                Int_t derivingMinimumPoint, Double_t startingMinimumDistance,
@@ -79,7 +79,7 @@ int Experiment(Float_t ImpactParameter, Double_t velocity, Float_t dt,
   TVector3 x2 = TVector3();
   TVector3 v2 = TVector3();
 
-  Float_t imp;
+  Double_t imp;
 
   EMparticle * p2;
 

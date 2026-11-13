@@ -24,6 +24,8 @@
 #include "TCanvas.h"
 #include "TMultiGraph.h"
 #include "TGraph.h"
+#include "TObjString.h"
+#include "TObjArray.h"
 
 TApplication * app;
 
@@ -145,6 +147,16 @@ int Experiment(particleParameters pi1, particleParameters pi2,
   Int_t deriveN;
 
   for(deriveN=0; !(Exp->GetEvent()->Inspect()); deriveN++){
+
+    // Without a cap this loop never ends when the inspectors are never satisfied.
+
+    if(MAXINSPECTSTEPS > 0 && deriveN >= MAXINSPECTSTEPS){
+
+      std::cerr<<"ERROR: Inspect() not satisfied within MAXINSPECTSTEPS ("<<MAXINSPECTSTEPS<<") steps, giving up this event"<<std::endl;
+
+      break;
+
+    }
     NPOINT_tree = deriveN;
     t_tree = Exp->GetEvent()->getParticle(1)->GetTime();
     x1_tree = Exp->GetEvent()->getParticle(1)->GetX().operator[](0);

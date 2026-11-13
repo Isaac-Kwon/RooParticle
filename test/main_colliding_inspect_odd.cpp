@@ -56,9 +56,9 @@ int main(){
   CollidingExperiment * exp = new CollidingExperiment();
   exp->setTemplate(eventT);
   
-  Float_t imp_min = 0.;
-  Float_t imp_max = +100.;
-  Float_t imp;
+  Double_t imp_min = 0.;
+  Double_t imp_max = +100.;
+  Double_t imp;
 
   EMparticle *p1, *p2;
 

@@ -80,9 +80,9 @@ int Experiment(Int_t nparticle, Int_t randomseed,
   TVector3 x2 = TVector3();
   TVector3 v2 = TVector3();
 
-  Float_t imp_min = 0.;
-  Float_t imp_max = +3000.;
-  Float_t imp;
+  Double_t imp_min = 0.;
+  Double_t imp_max = +3000.;
+  Double_t imp;
 
   EMparticle * p2;
 
@@ -156,6 +156,16 @@ int Experiment(Int_t nparticle, Int_t randomseed,
     // std::cout<<FTE->getEvent()<<std::endl;
 
     for(deriveN=0; !(FTE->getEvent()->Inspect()); deriveN++){
+
+      // Without a cap this loop never ends when the inspectors are never satisfied.
+
+      if(MAXINSPECTSTEPS > 0 && deriveN >= MAXINSPECTSTEPS){
+
+        std::cerr<<"ERROR: Inspect() not satisfied within MAXINSPECTSTEPS ("<<MAXINSPECTSTEPS<<") steps, giving up this event"<<std::endl;
+
+        break;
+
+      }
       FTE->getEvent()->DeriveDTN();
       distance = ((FTE->getEvent()->getParticle(0)->GetX())-(p2->GetX())).Mag();
       // if(deriveN%1000==0) FTE->getEvent()->Print(kFALSE, kFALSE, kTRUE);

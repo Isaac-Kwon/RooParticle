@@ -10,6 +10,7 @@
 #include "oddevent.hpp"
 #include "particle.hpp"
 #include "force.hpp"
+#include "runinfo.hpp"
 
 #include "iostream"
 #include <math.h>
@@ -60,7 +61,23 @@ Double_t angleXD(TVector3 v){
   return result;
 }
 
-int main(){
+// Usage: ./main [title] [jobIndex [seed]]
+//   title     name of the run, selects the output file Data/<title>_<jobIndex>.root (default "test").
+//             Taken as the title only if it is not a number, so that both
+//             "./main 3" and the job runners (macro/runmulti.py : target title jobIndex) work.
+//   jobIndex  index of this job (default 0)
+//   seed      explicit random seed (default: runinfo::kDefaultSeed + jobIndex)
+int main(int argc, char** argv){
+  Int_t   a = 1;
+  TString title = "test";
+  if(argc > 1 && !TString(argv[1]).IsDigit()){
+    title = argv[1];
+    a = 2;
+  }
+  Int_t jobIndex = (argc > a) ? atoi(argv[a]) : 0;
+  Long64_t seedArg = (argc > a+1) ? atoll(argv[a+1]) : -1;
+  UInt_t randseed = runinfo::SeedFromJob(jobIndex, seedArg);
+
   oddevent * eventT = new oddevent();
 
   coulombForce * cp = new coulombForce();
@@ -82,9 +99,9 @@ int main(){
   TVector3 x2 = TVector3();
   TVector3 v2 = TVector3();
 
-  Float_t imp_min = 0.;
-  Float_t imp_max = +1000.;
-  Float_t imp;
+  Double_t imp_min = 0.;
+  Double_t imp_max = +1000.;
+  Double_t imp;
 
   EMparticle * p2;
 
@@ -94,9 +111,9 @@ int main(){
   Double_t x2_[] = {-1000., 0., 0.,};
 
   Int_t i;
-  Int_t j=0;
+  Int_t j=jobIndex;
 
-  TString fname = TString::Format("Data/test_%d.root",j);
+  TString fname = TString::Format("Data/%s_%d.root",title.Data(),j);
 
   TFile * hfile = new TFile(fname,"RECREATE");
   TTree * tree = new TTree(TString::Format("TT_%d",j), "Rutherford Scattering Angle");
@@ -119,9 +136,14 @@ int main(){
   tree->Branch("SAngle", & SAngle_tree, "angle/D");
   tree->Branch("DCA", & DCA_tree, "DCA/D");
 
-  TRandom3 * r1 = new TRandom3();
+  TRandom3 * r1 = new TRandom3(randseed);
+  std::cout<< "Random seed : " << randseed << " (job index " << jobIndex << ")" << std::endl;
 
-  for(i=0; i<100 ;i++ ){
+  const Int_t nevents = 100;
+  runinfo::WriteCommon(randseed, 1., eventT->GetIntegratorName().Data(), nevents,
+                       "DEG<1 AND CNT>50000");
+
+  for(i=0; i<nevents ;i++ ){
 
     imp = r1->Uniform(imp_min, imp_max);
 

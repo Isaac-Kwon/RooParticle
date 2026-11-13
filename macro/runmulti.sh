@@ -1,18 +1,27 @@
+#!/bin/bash
+# Run "target title <job index>" njob times, ncore at a time (simple version of runmulti.py).
+# Usage: ./runmulti.sh target title njob [ncore]
+if [ $# -lt 3 ]; then
+  echo "Usage: $0 target title njob [ncore]" >&2
+  exit 2
+fi
+target=$1; title=$2; njob=$3; ncore=${4:-4}
+echo RUN $target $title : $njob jobs, $ncore at a time
 
-echo $1 $2 $3
-echo RUN $1 $2 : $3 times
+trap 'kill $(jobs -p) 2>/dev/null; exit 130' INT TERM
 
-njob=10
-
-for (( i = 0; i < $3; )); do
-  for (( j = 0; j < $njob-1; i++&&j++)); do
-    $1 $2 $i &
-    sleep 2
+fail=0
+pids=""
+for (( i = 0; i < njob; i++ )); do
+  while [ "$(jobs -rp | wc -l)" -ge "$ncore" ]; do
+    sleep 0.5
   done
-  if [ ${i} -eq $3 ];then
-    break
-  fi
-  $1 $2 $i
-  i=$((i+=1))
-  # echo outside
+  $target $title $i &
+  pids="$pids $!"
 done
+# Wait by the recorded pids: "jobs -p" no longer lists the jobs that already
+# finished, so their exit codes would be lost.
+for p in $pids; do
+  wait $p || fail=1
+done
+exit $fail

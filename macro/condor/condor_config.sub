@@ -1,5 +1,5 @@
-executable              = condor_run
-arguments               = excutable_Path_in_Build mtest_condor $(ClusterId) $(ProcId)
+executable              = condor_run.sh
+arguments               = executable_name_in_build mtest_condor $(ClusterId) $(ProcId)
 output                  = condor/output/run.$(ClusterId).$(ProcId).out
 error                   = condor/error/run.$(ClusterId).$(ProcId).err
 log                     = condor/log/run.$(ClusterId).log
@@ -8,5 +8,5 @@ request_cpus            = 1
 request_memory          = 1G
 notification            = Error
 getenv                  = true
-#transfer_output_files   = build/Data/mtest_condor_$(ClusterID)_$(ProcID).root
+#transfer_output_files   = RooParticle/build/Data/mtest_condor_$(ClusterId)_$(ProcId).root
 queue 1
