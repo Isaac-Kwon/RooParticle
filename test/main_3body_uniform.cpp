@@ -11,6 +11,7 @@
 #include "event.hpp"
 #include "particle.hpp"
 #include "force.hpp"
+#include "runinfo.hpp"
 
 #include "iostream"
 #include <math.h>
@@ -92,14 +93,14 @@ int main(int argc, char** argv){
   TVector3 v3 = TVector3();
 
   //Square source
-  Float_t impactLX = 1000;
-  Float_t impactLY = 1000;
+  Double_t impactLX = 1000;
+  Double_t impactLY = 1000;
 
   //z = -zmax plain
-  Float_t xmin = -1 * impactLX;
-  Float_t xmax = impactLX;
-  Float_t ymin = -1 * impactLY;
-  Float_t ymax = impactLY;
+  Double_t xmin = -1 * impactLX;
+  Double_t xmax = impactLX;
+  Double_t ymin = -1 * impactLY;
+  Double_t ymax = impactLY;
 
   //Starting Z
   Double_t startZl =  1000;
@@ -169,11 +170,13 @@ int main(int argc, char** argv){
   Double_t   outtime_free;
   Int_t      RN_tree;
 
-  unsigned int randseed = (unsigned int) time(NULL);
-
-  if(argc>=4){
-    randseed = randseed * atof(argv[3]) + atof(argv[2]);
-  }
+  // Seed: explicit (argv[3]) or runinfo::kDefaultSeed + job index (argv[2]).
+  // The old time(NULL) seed made jobs started in the same second identical.
+  Int_t jobIndex = (argc > 2) ? atoi(argv[2]) : 0;
+  Long64_t seedArg = (argc > 3) ? atoll(argv[3]) : -1;
+  UInt_t randseed = runinfo::SeedFromJob(jobIndex, seedArg);
+  cout<<"RandomSeed : "<<randseed<<endl;
+  runinfo::WriteCommon(randseed, 1., eventT->GetIntegratorName().Data(), 100, "DeriveMAX");
 
   //Branch: starting point 1
   tree->Branch("sx1", &sx1_tree , "sx1/D");
@@ -205,8 +208,8 @@ int main(int argc, char** argv){
   tree->Branch("TCA_TB", &TCATB_tree, "TCA_TB/D");
   tree->Branch("TCA_AB", &TCAAB_tree, "TCA_AB/D");
 
-  tree->Branch("RSeed",  &randseed,  "RSeed/I");
-  tree->Branch("RSeed",  &RN_tree,  "RN/I");
+  tree->Branch("RSeed",  &randseed,  "RSeed/i");
+  tree->Branch("RN",     &RN_tree,  "RN/I");
 
   TRandom3 * rg = new TRandom3(randseed);
 

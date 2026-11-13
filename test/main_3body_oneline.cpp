@@ -86,7 +86,7 @@ int Experiment(Int_t nparticle, Int_t randomseed,
 
   // Float_t imp_min = 0.;
   // Float_t imp_max = +3000.;
-  Float_t imp;
+  Double_t imp;
 
   EMparticle *p2, *p3;
 
@@ -189,6 +189,16 @@ int Experiment(Int_t nparticle, Int_t randomseed,
     Double_t distance12=numeric_limits<Double_t>::max();
 
     for(deriveN=0; !(Exp->getEvent()->Inspect()); deriveN++){
+
+      // Without a cap this loop never ends when the inspectors are never satisfied.
+
+      if(MAXINSPECTSTEPS > 0 && deriveN >= MAXINSPECTSTEPS){
+
+        std::cerr<<"ERROR: Inspect() not satisfied within MAXINSPECTSTEPS ("<<MAXINSPECTSTEPS<<") steps, giving up this event"<<std::endl;
+
+        break;
+
+      }
       Exp->getEvent()->DeriveDTN();
       distance01 = ((Exp->getEvent()->getParticle(0)->GetX())-(p2->GetX())).Mag();
       distance02 = ((Exp->getEvent()->getParticle(0)->GetX())-(p3->GetX())).Mag();

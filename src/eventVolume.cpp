@@ -22,11 +22,11 @@ eventVGeneral::eventVGeneral(Double_t xmin, Double_t xmax,
 
 eventVGeneral::eventVGeneral(Double_t xlen,
                              Double_t ylen,
-                             Double_t zlen): eventVolume() {
-  // std::cout<< "Generate " <<xlen<< ", " << ylen << ", " << zlen << endl;
+                             Double_t zlen):
   eventVGeneral(-1*xlen/2, xlen/2,
                 -1*ylen/2, ylen/2,
-                -1*zlen/2, zlen/2);
+                -1*zlen/2, zlen/2) {
+  // Box centered at the origin.
 }
 
 Bool_t eventVGeneral::Inside(TVector3 position){

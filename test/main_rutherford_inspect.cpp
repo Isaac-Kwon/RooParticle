@@ -11,6 +11,7 @@
 #include "particle.hpp"
 #include "force.hpp"
 #include "recorder.hpp"
+#include "runinfo.hpp"
 
 #include "iostream"
 #include <math.h>
@@ -61,8 +62,12 @@ int Experiment(Int_t nparticle, Int_t randomseed,
                TString outputFilename,
                Double_t derivingDegreeCriterion, Int_t derivingMinimumPoint,
                Double_t velocity, Double_t startingMinimumDistance,
-               Int_t vperiod, Int_t autosavePeriod){
+               Int_t vperiod, Int_t autosavePeriod,
+               TString integratorName){
   event * eventT = new event();
+  if(!eventT->SetIntegrator(integratorName)){
+    return 1;
+  }
 
   coulombForce * cp = new coulombForce();
   eventVGeneral * vol = new eventVGeneral(40.,40.,40.);
@@ -83,9 +88,9 @@ int Experiment(Int_t nparticle, Int_t randomseed,
   TVector3 x2 = TVector3();
   TVector3 v2 = TVector3();
 
-  Float_t imp_min = 0.;
-  Float_t imp_max = +3000.;
-  Float_t imp;
+  Double_t imp_min = 0.;
+  Double_t imp_max = +3000.;
+  Double_t imp;
 
   EMparticle * p2;
 
@@ -104,17 +109,18 @@ int Experiment(Int_t nparticle, Int_t randomseed,
 
   std::cout<< "ROOT File save in " << fname << std::endl;
 
-  Double_t   imp_tree;
-  Int_t      NPOINT_tree;
-  Double_t   fx_tree;
-  Double_t   fy_tree;
-  Double_t   sx_tree;
-  Double_t   sy_tree;
-  Double_t   vxF_tree;
-  Double_t   vyF_tree;
-  Double_t   SAngle_tree;
-  Double_t   DCA_tree;
-  Double_t   outtime_free;
+  // Initialized so that no branch can ever hold garbage.
+  Double_t   imp_tree     = 0.;
+  Int_t      NPOINT_tree  = 0;
+  Double_t   fx_tree      = 0.;
+  Double_t   fy_tree      = 0.;
+  Double_t   sx_tree      = 0.;
+  Double_t   sy_tree      = 0.;
+  Double_t   vxF_tree     = 0.;
+  Double_t   vyF_tree     = 0.;
+  Double_t   SAngle_tree  = 0.;
+  Double_t   DCA_tree     = 0.;
+  Double_t   outtime_free = 0.;
 
 
   tree->Branch("imp", &imp_tree, "imp/D");
@@ -129,6 +135,11 @@ int Experiment(Int_t nparticle, Int_t randomseed,
   tree->Branch("DCA", & DCA_tree, "DCA/D");
 
   TRandom3 * r1 = new TRandom3(randomseed);
+  std::cout<< "Random seed : " << randomseed << std::endl;
+
+  // Run parameters go into the file next to the tree.
+  runinfo::WriteCommon((UInt_t) randomseed, 1., eventT->GetIntegratorName().Data(), nparticle,
+                       TString::Format("DEG<%g AND CNT>%d", derivingDegreeCriterion, derivingMinimumPoint).Data());
 
   Double_t ImpWall = startingMinimumDistance * TMath::Tan(derivingDegreeCriterion*TMath::DegToRad());
 
@@ -158,13 +169,13 @@ int Experiment(Int_t nparticle, Int_t randomseed,
     imp_tree = imp;
     sx_tree = x2_[0];
     sy_tree = x2_[1];
-    // NPOINT_tree = p2->GetPath()->GetMaxNumber();
-    // fx_tree  = p2->GetPath()->GetLastX().operator[](0);
-    // fy_tree  = p2->GetPath()->GetLastX().operator[](1);
-    // vxF_tree = p2->GetPath()->GetLastV().operator[](0);
-    // vyF_tree = p2->GetPath()->GetLastV().operator[](1);
-    // SAngle_tree = angleXD(p2->GetPath()->GetLastV());
-    // p2->GetPath()->GetDCA(x1, DCA_tree, outtime_free);
+    NPOINT_tree = p2->GetPath()->GetMaxNumber();
+    fx_tree  = p2->GetPath()->GetLastX().operator[](0);
+    fy_tree  = p2->GetPath()->GetLastX().operator[](1);
+    vxF_tree = p2->GetPath()->GetLastV().operator[](0);
+    vyF_tree = p2->GetPath()->GetLastV().operator[](1);
+    SAngle_tree = angleXD(p2->GetPath()->GetLastV());
+    p2->GetPath()->GetDCA(x1, DCA_tree, outtime_free);
 
     tree->Fill();
 
@@ -202,6 +213,7 @@ int Experiment(Int_t nparticle, Int_t randomseed,
 // -V   Incident Particle's Velocity (r.SOL)
 // -v   Verbose Period
 // -S   Autosave Period
+// -I   Integrator (TAYLOR, SEULER, VERLET, RK4)
 // -h   Help
 //===============================================================================
 
@@ -218,7 +230,8 @@ int main(int argc, char *argv[]){
   Double_t velocity                = 0.05;
   Int_t    vperiod                 = 5;
   Int_t    autosavePeriod          = 100;
-  
+  TString  integratorName          = "TAYLOR";
+
   //Modified Counter
   Bool_t   f_nparticle               = kFALSE;
   Bool_t   f_randomseed              = kFALSE;
@@ -229,8 +242,9 @@ int main(int argc, char *argv[]){
   Bool_t   f_velocity                = kFALSE;
   Bool_t   f_vperiod                 = kFALSE;
   Bool_t   f_autosavePeriod          = kFALSE;
+  Bool_t   f_integratorName          = kFALSE;
 
-  while( (c = getopt(argc, argv, "n:r:o:d:D:p:V:v:S:h")) != -1){
+  while( (c = getopt(argc, argv, "n:r:o:d:D:p:V:v:S:I:h")) != -1){
   // -1 means getopt() parse all options
   switch(c){
     case 'n':
@@ -269,6 +283,10 @@ int main(int argc, char *argv[]){
       autosavePeriod = std::stoi(optarg);
       f_autosavePeriod = kTRUE;
       break;
+    case 'I':
+      integratorName = TString(optarg);
+      f_integratorName = kTRUE;
+      break;
     case 'h':
       std::cout<<"Rutherford Experiment Simulation (Numerical)"<<std::endl;
       std::cout<<"If there's less argv than parameters, it will use default value for absents"<<std::endl<<std::endl;
@@ -281,6 +299,7 @@ int main(int argc, char *argv[]){
       std::cout<<"-V \tIncident Particle's Velocity (r.SOL)" <<std::endl;
       std::cout<<"-v \tVerbose Period" <<std::endl;
       std::cout<<"-S \tAutosave Period" <<std::endl;
+      std::cout<<"-I \tIntegrator (TAYLOR, SEULER, VERLET, RK4)" <<std::endl;
       std::cout<<"-h \tHelp (this message)" <<std::endl;
       return 0;
     case '?':
@@ -301,11 +320,12 @@ int main(int argc, char *argv[]){
   std::cout<<"Incident Particle's Velocity (r.SOL) (V) : " << velocity << " " << (!f_velocity ? "(Default)" : " ") << std::endl;
   std::cout<<"Minimum Incident Distance (D) : " << startingMinimumDistance << " " << (!f_startingMinimumDistance ? "(Default)" : " ") << std::endl;
 
-  std::cout<<"Output File's Name (o) : "<< outputFilename << " " << (!f_nparticle ? "(Default)" : " ") << std::endl;
+  std::cout<<"Output File's Name (o) : "<< outputFilename << " " << (!f_outputFilename ? "(Default)" : " ") << std::endl;
   std::cout<<"Verbose Period (v) : " << vperiod << " " << (!f_vperiod ? "(Default)" : " ") << std::endl;
   std::cout<<"Autosave Period (S) : " << autosavePeriod << " " << (!f_autosavePeriod ? "(Default)" : " ") << std::endl;
+  std::cout<<"Integrator (I) : " << integratorName << " " << (!f_integratorName ? "(Default)" : " ") << std::endl;
   std::cout<<"===========================================" << std::endl << std::endl;
 
-  return Experiment(nparticle, randomseed, outputFilename, derivingDegreeCriterion, derivingMinimumPoint, velocity, startingMinimumDistance, vperiod, autosavePeriod);
+  return Experiment(nparticle, randomseed, outputFilename, derivingDegreeCriterion, derivingMinimumPoint, velocity, startingMinimumDistance, vperiod, autosavePeriod, integratorName);
 
 }

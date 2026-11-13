@@ -46,6 +46,8 @@ particle::particle(const particle & p){
   hold       = p.hold;
   hF         = p.hF;
   etime      = p.etime;
+  ecount     = p.ecount; // the copy continues the same step count (CNT inspectors)
+  recordPeriod = p.recordPeriod;
   q          = p.q;
   if(p.Record){
    ppath = new path(*(p.ppath));
@@ -73,6 +75,16 @@ void particle::releaseForce(const Double_t dt){
 void particle::resetHold(){
   hold=false;
   hF = TVector3();
+}
+
+void particle::finishStep(const Double_t dt){
+  // Same bookkeeping as applyForce(): invincible particles count the step
+  // but do not advance their own time.
+  ecount += 1;
+  if(!Invincible){
+    etime += dt;
+  }
+  recordStep();
 }
 
 TVector3 particle::calculateCalibrateVelocity(event* ev_, Bool_t ignoreInvincible){
@@ -105,9 +117,7 @@ TVector3 particle::calibrateVelocity(event* ev_, Bool_t ignoreInvincible, Bool_t
 void particle::applyForce(const TVector3 f, const Double_t dt, const Bool_t SR){
   ecount+=1;
   if(Invincible==true){
-    if(Record==true){
-      ppath->AddRecord(x,v, etime);
-    }
+    recordStep();
     return;
   }
   Double_t m_ = GetM(!SR);
@@ -119,13 +129,7 @@ void particle::applyForce(const TVector3 f, const Double_t dt, const Bool_t SR){
     a * dt
   );
   etime += dt;
-  if(Record==true){
-    // cout<<"RECORD"<<endl;
-    // x.Print();
-    // v.Print();
-    ppath->AddRecord(x,v, etime);
-    // cout<<"RECORD E"<<endl;
-    }
+  recordStep();
   // cout<<"APPLYFORCE"<<endl;
   // f.Print();
   // cout<<dt<<" / "<<etime<<endl;
@@ -137,6 +141,19 @@ Double_t particle::GetM(Bool_t restmass){
   }
   Double_t v_ = v.Mag();
   return ( 1/sqrt( 1-pow(v_,2) )) * m0;
+}
+
+Double_t particle::GetGamma(){
+  // Same expression as GetM(kFALSE), so that GetGamma()*GetM0() == GetM(kFALSE).
+  Double_t v_ = v.Mag();
+  return 1/sqrt( 1-pow(v_,2) );
+}
+
+TVector3 particle::GetMomentum(Bool_t relativistic){
+  if(relativistic){
+    return TVector3(v * (GetGamma() * m0));
+  }
+  return TVector3(v * m0);
 }
 
 TString onelineTVectorS(TVector3 vec){
@@ -170,4 +187,4 @@ TString particle::Print(Bool_t onlymechanic, Bool_t mute){
   }
 
   return result;  
-}
+}

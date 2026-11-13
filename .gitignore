@@ -32,7 +32,25 @@
 *.app
 
 # cmake, building folder, testfile
-build
+# in-source and out-of-source build directories
+build/
+build-*/
+/cmake-build-*/
+# in-source cmake/ctest artifacts (an in-source build)
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+Install_manifest.txt
+Testing/
+compile_commands.json
+/Makefile
+/librooparticle.a
+/main
+/test_*
+# generated simulation output (Data/ itself is created by cmake in the build dir)
+/Data/
+*.root
 #CMakeLists.txt
 prove_test
 loader.cpp
@@ -42,6 +60,7 @@ exclude
 .DS_Store
 analysis
 test/Data/*
+!test/Data/README.md
 test/main_private*
 doc
 .pre-commit-clang-format

@@ -12,9 +12,9 @@ using namespace std;
 path::path(){
 }
 
-path::path(path& path_){
-  std::vector<TVector3>::iterator i1;
-  std::vector<Double_t>::iterator i2;
+path::path(const path& path_){
+  std::vector<TVector3>::const_iterator i1;
+  std::vector<Double_t>::const_iterator i2;
 
   for(i1=path_.pos.begin();i1!=path_.pos.end();++i1){
     pos.push_back(*i1);
@@ -143,50 +143,104 @@ void path::GetLast(TVector3 & x_, TVector3 & v_,
   return;
 }
 
-void path::GetDCA(const TVector3 pos_, Double_t & DCA, Double_t & outtime, Bool_t verbose){
-  Int_t i;
-  Double_t resultDCA=std::numeric_limits<double>::max();
-  Double_t tempDCA=-2.;
-  Int_t resultTI=-1;
-  TVector3 tempvector;
-  // for(std::vector<TVector3>::iterator it = pos.begin();
-  //     it != pos.end(); ++it){
-  for(i=0; i<pos.size(); i++){
-    tempvector = pos.at(i)-GetRecordX(i);
-    tempDCA = tempvector.Mag();
-    if(tempDCA<resultDCA){
-      resultDCA = tempDCA;
-      resultTI = i;
-    }
-  }
-  if(resultTI==-1 || verbose){
-    std::cerr<<"path::GetDCA : Algorithm Error - Result Index 0"<<std::endl;
-  }
-  DCA     = resultDCA;
-  outtime = t[resultTI];
+// Sentinel written to DCA and outtime when no distance can be computed
+// (empty path, length/time mismatch, null pointer).
+static const Double_t kPathDCAInvalid = -1.;
+
+// Refine a discrete minimum of the squared distance d2[] at index k by a
+// parabola through samples k-1, k, k+1 (t need not be uniform). The recorded
+// steps are coarse, so the true closest approach usually lies between two
+// of them. Keeps the discrete values at the path ends, for non-increasing
+// time, or when the parabola has no interior minimum (degenerate fit).
+static void RefineMinimum(const std::vector<Double_t> & d2,
+                          const std::vector<Double_t> & t,
+                          Int_t k, Double_t & DCA, Double_t & outtime){
+  DCA     = sqrt(d2[k]);
+  outtime = t[k];
+  if(k<=0 || k>=(Int_t)d2.size()-1) return;
+
+  Double_t s0 = t[k-1]-t[k];
+  Double_t s2 = t[k+1]-t[k];
+  if(!(s0<0. && s2>0.)) return;
+
+  Double_t y1 = d2[k];
+  Double_t q0 = (d2[k-1]-y1)/s0;
+  Double_t q2 = (d2[k+1]-y1)/s2;
+  Double_t a  = (q0-q2)/(s0-s2);
+  if(!(a>0.)) return;
+  Double_t b  = q2-a*s2;
+  Double_t sm = -b/(2.*a);
+  if(sm<s0 || sm>s2) return;
+
+  Double_t dmin2 = y1-b*b/(4.*a);
+  if(dmin2<0.) dmin2 = 0.; // rounding only; distance squared cannot be negative
+  DCA     = sqrt(dmin2);
+  outtime = t[k]+sm;
 }
 
-void path::GetDCA(path* timepath, Double_t & DCA, Double_t & outtime, Bool_t verbose){
-  if(!timeChk(timepath)){
+void path::GetDCA(const TVector3 pos_, Double_t & DCA, Double_t & outtime, Bool_t verbose, Bool_t interpolate){
+  DCA     = kPathDCAInvalid;
+  outtime = kPathDCAInvalid;
+
+  if(pos.empty() || pos.size()!=t.size()){
+    std::cerr<<"path::GetDCA : EMPTY OR INCONSISTENT PATH, RETURN DCA=-1, TIME=-1"<<std::endl;
     return;
   }
 
-  Double_t resultDCA=std::numeric_limits<double>::max();
-  Double_t tempDCA=-2.;
-  Int_t resultTI=-1;
-  TVector3 tempvector;
-
-  Int_t i;
-  for(i=0; i<pos.size(); ++i){
-    tempvector = (timepath->GetRecordX(i))-GetRecordX(i);
-    tempDCA = tempvector.Mag();
-    if(tempDCA<resultDCA){
-      resultDCA = tempDCA;
-      resultTI = i;
-    }
+  std::vector<Double_t> d2(pos.size());
+  Int_t resultTI=0;
+  for(Int_t i=0; i<(Int_t)pos.size(); i++){
+    // distance to the fixed point (not to the path itself)
+    d2[i] = (pos[i]-pos_).Mag2();
+    if(d2[i]<d2[resultTI]) resultTI = i;
   }
-  DCA     = resultDCA;
-  outtime = t[resultTI];
+
+  if(interpolate){
+    RefineMinimum(d2, t, resultTI, DCA, outtime);
+  }
+  else{
+    DCA     = sqrt(d2[resultTI]);
+    outtime = t[resultTI];
+  }
+  if(verbose){
+    std::cerr<<"path::GetDCA : index "<<resultTI<<" DCA "<<DCA<<" time "<<outtime<<std::endl;
+  }
+}
+
+void path::GetDCA(path* timepath, Double_t & DCA, Double_t & outtime, Bool_t verbose, Bool_t interpolate){
+  DCA     = kPathDCAInvalid;
+  outtime = kPathDCAInvalid;
+
+  if(timepath==nullptr){
+    std::cerr<<"path::GetDCA : NULL PATH, RETURN DCA=-1, TIME=-1"<<std::endl;
+    return;
+  }
+  if(!timeChk(timepath)){
+    std::cerr<<"path::GetDCA : PATHS DO NOT SHARE TIME GRID, RETURN DCA=-1, TIME=-1"<<std::endl;
+    return;
+  }
+  if(pos.empty() || pos.size()!=t.size() || timepath->pos.size()!=pos.size()){
+    std::cerr<<"path::GetDCA : EMPTY OR INCONSISTENT PATH, RETURN DCA=-1, TIME=-1"<<std::endl;
+    return;
+  }
+
+  std::vector<Double_t> d2(pos.size());
+  Int_t resultTI=0;
+  for(Int_t i=0; i<(Int_t)pos.size(); ++i){
+    d2[i] = (timepath->pos[i]-pos[i]).Mag2();
+    if(d2[i]<d2[resultTI]) resultTI = i;
+  }
+
+  if(interpolate){
+    RefineMinimum(d2, t, resultTI, DCA, outtime);
+  }
+  else{
+    DCA     = sqrt(d2[resultTI]);
+    outtime = t[resultTI];
+  }
+  if(verbose){
+    std::cerr<<"path::GetDCA : index "<<resultTI<<" DCA "<<DCA<<" time "<<outtime<<std::endl;
+  }
 }
 
 Bool_t path::lengthChk(path* target){

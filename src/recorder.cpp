@@ -20,7 +20,7 @@ void recorder<Element>::Print(){
 template <typename Element> 
 Bool_t recorder<Element>::CMPSave(const Bool_t sgn, const Element data_){
 // if sgn kTRUE, save higher value. if kFALSE, save lower value.
-    if((sgn && data_>data) || (sgn && data_<data)){
+    if((sgn && data_>data) || (!sgn && data_<data)){
         Save(data_);
         return kTRUE; //If saved, return kTRUE
     }

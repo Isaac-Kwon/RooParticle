@@ -40,3 +40,9 @@ void experimentP::MakeEvent(particle* p1, ...){
 
     return;
 }
+
+experiment::experiment(event* eventT_){
+  // Takes the template only; events are created by MakeEvent().
+  eventT = eventT_;
+  currentEvent = nullptr;
+}

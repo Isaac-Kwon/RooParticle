@@ -3,6 +3,7 @@
 #include "event.hpp"
 #include "particle.hpp"
 #include "force.hpp"
+#include "runinfo.hpp"
 
 #include "iostream"
 #include <math.h>
@@ -52,6 +53,13 @@ Double_t angleXD(TVector3 v){
   return result*(180./3.1415926535);
 }
 
+// Usage: ./test_collider_HeHe [title] [jobIndex [seed]]
+//   title     name of the run, selects Data/<title>_<jobIndex>.root (default "test_collider").
+//             Taken as the title only if it is not a number, so that both
+//             "./test_collider_HeHe 3" and the job runners (macro/runmulti.py : target title jobIndex) work.
+//   jobIndex  index of this job (default 0)
+//   seed      explicit random seed (default: runinfo::kDefaultSeed + jobIndex,
+//             so parallel jobs never share a seed, unlike a time(NULL) seed)
 int main(int argc, char** argv){
 
   event * eventT = new event();
@@ -74,8 +82,8 @@ int main(int argc, char** argv){
   TVector3 x2 = TVector3();
   TVector3 v2 = TVector3();
 
-  Float_t imp_min = 0.;
-  Float_t imp_max = +1000.;
+  Double_t imp_min = 0.;
+  Double_t imp_max = +1000.;
 
   EMparticle * p1, * p2;
 
@@ -84,26 +92,30 @@ int main(int argc, char** argv){
 
   Double_t x2_[] = {-1000, 0., 0.,};
 
-  UInt_t randseed = (unsigned int) time(NULL);
+  // argc counts the program name, so "no argument" is argc==1 (not 0).
+  Int_t   a = 1;
+  TString title = "test_collider";
+  if(argc > 1 && !TString(argv[1]).IsDigit()){
+    title = argv[1];
+    a = 2;
+  }
+  Int_t jobIndex = (argc > a) ? atoi(argv[a]) : 0;
+  Long64_t seedArg = (argc > a+1) ? atoll(argv[a+1]) : -1;
+  UInt_t randseed = runinfo::SeedFromJob(jobIndex, seedArg);
   TRandom3 * rg = new TRandom3(randseed);
 
   Int_t i;
-  Int_t j=0;
 
   TFile * hfile;
 
   
   TString findex;
-  if(argc==0){
-    findex = TString("0");
-  }else{
-    findex = TString(argv[1]);
-  }
-  
-  hfile = new TFile(TString::Format("Data/test_collider_%s.root",argv[1]),"RECREATE");
+  findex = TString::Format("%d", jobIndex);
+
+  hfile = new TFile(TString::Format("Data/%s_%s.root",title.Data(),findex.Data()),"RECREATE");
   TTree * tree = new TTree("T_Colliding", "Two Particle Colliding Angle");
 
-  Float_t    imp;
+  Double_t   imp;
   Int_t      NPOINT;
   Double_t   vx1;
   Double_t   vx2;
@@ -112,7 +124,7 @@ int main(int argc, char** argv){
   Double_t   DCA;
   Double_t   outtime;
 
-  tree->Branch("imp", &imp, "imp/F");
+  tree->Branch("imp", &imp, "imp/D");
   tree->Branch("NPOINT", &NPOINT, "Npoint/I");
   tree->Branch("x1", & vx1, "x1/D");
   tree->Branch("x2", & vx2, "x2/D");
@@ -124,6 +136,7 @@ int main(int argc, char** argv){
 
   cout<<"Starting Data Production Index "<<findex<<endl;
   cout<<"RandomSeed : "<<randseed<<endl;
+  runinfo::WriteCommon(randseed, 1., eventT->GetIntegratorName().Data(), 100, "DeriveMAX");
   for(i=0; i<100; i++){
     imp = rg->Uniform(imp_min,imp_max);
     x2_[1] = imp;
@@ -158,10 +171,10 @@ int main(int argc, char** argv){
   }
 
 
-  if(argc==0){
+  if(argc<=1){
     tree->Print();
   }else{
-    cout<<"JOB END: "<<argv[1]<<endl;
+    cout<<"JOB END: "<<findex<<endl;
   }
   tree->AutoSave();
   hfile->Write();

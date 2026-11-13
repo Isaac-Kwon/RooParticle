@@ -83,7 +83,7 @@ int Experiment(Double_t ImpactParameter,
   TVector3 x2 = TVector3();
   TVector3 v2 = TVector3();
 
-  Float_t imp;
+  Double_t imp;
 
   EMparticle * p2;
 
@@ -140,6 +140,11 @@ int Experiment(Double_t ImpactParameter,
     
     imp_tree = imp;
     for(DeriveN=0; !(FTE->getEvent()->Inspect()); DeriveN++){
+      // Without a cap this loop never ends when the inspectors are never satisfied.
+      if(MAXINSPECTSTEPS > 0 && DeriveN >= MAXINSPECTSTEPS){
+        std::cerr<<"ERROR: Inspect() not satisfied within MAXINSPECTSTEPS ("<<MAXINSPECTSTEPS<<") steps, giving up this event"<<std::endl;
+        break;
+      }
       if(DeriveN%autosavePeriod==0) tree->AutoSave();
       x_tree = FTE->getEvent()->getParticle(1)->GetX().operator[](0);
       y_tree = FTE->getEvent()->getParticle(1)->GetX().operator[](1);

@@ -1,3 +1,12 @@
+/// \file eventViewer.hpp
+/// \brief Unfinished, disabled stub for a graphical event viewer.
+///
+/// \warning Not implemented. Everything in this header is commented out (a
+/// GUIparticle with a colour and an eventViewer returning a TCanvas); only the
+/// includes remain active, and src/eventViewer.cpp is empty apart from its
+/// include. Nothing in the code base uses it.
+/// \todo Implement or remove.
+
 #ifndef H_EVENTVIEWER
 #define H_EVENTVIEWER 1;
 

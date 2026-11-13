@@ -81,9 +81,9 @@ int main(){
   TVector3 x2 = TVector3();
   TVector3 v2 = TVector3();
 
-  Float_t imp_min = 0.;
-  Float_t imp_max = +1000.;
-  Float_t imp;
+  Double_t imp_min = 0.;
+  Double_t imp_max = +1000.;
+  Double_t imp;
 
   EMparticle * p2;
 
