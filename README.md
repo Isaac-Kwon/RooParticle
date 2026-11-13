@@ -13,7 +13,8 @@ computed with an error estimate. Results and run metadata are written to a
 ROOT `TTree`. Two-body scattering (Rutherford) is the special case with an
 exact answer, and is used for validation.
 
-The manual is generated with Doxygen (`make doc`, see below). It has a
+The manual is published at <https://isaac-kwon.github.io/RooParticle/> and
+can be generated locally with Doxygen (`make doc`, see below). It has a
 tutorial in which every code block is a tested program, a concepts page and
 a validation page. Open work is listed in [TODO.md](TODO.md).
 
